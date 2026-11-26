@@ -5,6 +5,10 @@ export interface ObservationCandidate {
   valueAsReported: string;
   unitAsReported: string | null;
   referenceAsReported: string | null;
+  reviewedTestName: string;
+  reviewedValueAsReported: string;
+  reviewedUnitAsReported: string;
+  reviewedReferenceAsReported: string;
   rawLine: string;
   page: number;
   line: number;
@@ -72,6 +76,10 @@ function parseMeasurementLine(rawLine: string, page: number, line: number): Obse
       valueAsReported,
       unitAsReported,
       referenceAsReported,
+      reviewedTestName: entry.name,
+      reviewedValueAsReported: valueAsReported,
+      reviewedUnitAsReported: unitAsReported ?? "",
+      reviewedReferenceAsReported: referenceAsReported ?? "",
       rawLine: cleanLine,
       page,
       line,

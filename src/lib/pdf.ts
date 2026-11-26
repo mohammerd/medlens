@@ -70,12 +70,22 @@ export async function extractPdfText(
           return [{ text: item.str, x, y: baselineY, width, height, bounds: null }];
         }
 
-        const viewportRect = viewport.convertToViewportRectangle([
-          x,
-          baselineY - height,
-          x + width,
-          baselineY,
-        ]) as [number, number, number, number];
+        const [a, b, c, d, e, f] = viewport.transform;
+        const corners = [
+          [x, baselineY - height],
+          [x + width, baselineY - height],
+          [x, baselineY],
+          [x + width, baselineY],
+        ].map(([pointX, pointY]) => [
+          a * pointX + c * pointY + e,
+          b * pointX + d * pointY + f,
+        ]);
+        const viewportRect: [number, number, number, number] = [
+          Math.min(...corners.map((point) => point[0])),
+          Math.min(...corners.map((point) => point[1])),
+          Math.max(...corners.map((point) => point[0])),
+          Math.max(...corners.map((point) => point[1])),
+        ];
 
         return [{
           text: item.str,
@@ -156,6 +166,7 @@ export async function renderPdfPage(
     canvas.height = Math.ceil(viewport.height * outputScale);
 
     await page.render({
+      canvas,
       canvasContext: context,
       viewport,
       transform: outputScale === 1 ? undefined : [outputScale, 0, 0, outputScale, 0, 0],

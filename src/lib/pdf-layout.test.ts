@@ -40,7 +40,7 @@ describe("groupPositionedText", () => {
     ]);
 
     const candidates = detectObservationCandidates(
-      "--- Page 1 ---\\n" + rows.map((row) => row.text).join("\\n"),
+      "--- Page 1 ---\n" + rows.map((row) => row.text).join("\n"),
     );
 
     expect(candidates).toHaveLength(2);

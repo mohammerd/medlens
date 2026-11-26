@@ -29,12 +29,14 @@ describe("detectObservationCandidates", () => {
       "HDL cholesterol 1.3 mmol/L",
       "LDL-C 2.7 mmol/L",
       "HbA1c 5.6 %",
+      "Hemoglobin A1c 5.7 %",
     ].join("\n"));
 
     expect(rows.map((row) => row.testKey)).toEqual([
       "total-cholesterol",
       "hdl-cholesterol",
       "ldl-cholesterol",
+      "hba1c",
       "hba1c",
     ]);
     expect(rows.every((row) => row.confirmed === false)).toBe(true);

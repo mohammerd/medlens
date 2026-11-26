@@ -18,6 +18,10 @@ describe("detectObservationCandidates", () => {
       referenceAsReported: "12.0-16.0",
       page: 1,
       confirmed: false,
+      reviewedTestName: "Haemoglobin",
+      reviewedValueAsReported: "13.4",
+      reviewedUnitAsReported: "g/dL",
+      reviewedReferenceAsReported: "12.0-16.0",
     });
     expect(rows[1].unitAsReported).toBe("10^9/L");
     expect(rows[2].testName).toBe("Platelet count");
@@ -42,6 +46,7 @@ describe("detectObservationCandidates", () => {
     expect(rows.every((row) => row.confirmed === false)).toBe(true);
     expect(rows[0]).not.toHaveProperty("clinicalStatus");
     expect(rows[0].referenceAsReported).toBeNull();
+    expect(rows[0].reviewedValueAsReported).toBe("4.8");
   });
 
   it("tracks page markers and source line numbers", () => {

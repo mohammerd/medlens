@@ -21,7 +21,8 @@ MEDLENS is being developed as an open-source research project. A completed inter
 
 ## Phase 1 — reliable local document review
 
-- Test PDF text extraction against synthetic fixtures from different PDF generators.
+- Test PDF text extraction and highlight geometry against synthetic fixtures from different PDF generators.
+- Improve text-fragment bounds for rotated text, multi-column layouts and mixed font sizes.
 - Improve table reconstruction across multiple laboratory PDF templates while preserving source text.
 - Add scanned-PDF and image OCR as a separately evaluated feature.
 - Store user-confirmed observations in a typed review model, including source coordinates when reliable.

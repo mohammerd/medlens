@@ -28,7 +28,6 @@ import {
   Sparkles,
   Sun,
   TrendingUp,
-  History,
   X,
 } from "lucide-react";
 import { demoReports, demoResultsByReport, trendPoints, type LabReport, type LabResult } from "./data/demo";
@@ -274,7 +273,7 @@ function App() {
 
           {view === "Trends" && (
             <>
-              <section className="page-heading"><div><div className="eyebrow">LONGITUDINAL INTELLIGENCE</div><h1>Measurement trends<span className="heading-period">.</span></h1><p>Explore how MEDLENS will compare compatible measurements across reports.</p></div><span className="prototype-tag"><History size={14} /> Synthetic timeline</span></section>
+              <section className="page-heading"><div><div className="eyebrow">LONGITUDINAL INTELLIGENCE</div><h1>Measurement trends<span className="heading-period">.</span></h1><p>Explore how MEDLENS will compare compatible measurements across reports.</p></div><span className="prototype-tag"><TrendingUp size={14} /> Synthetic timeline</span></section>
               <div className="insight-banner"><div className="insight-banner-icon"><Info size={18} /></div><div><strong>Comparisons need context.</strong><p>Different laboratories, methods, units and reference intervals can make two results non-comparable. This prototype chart uses fabricated values only.</p></div></div>
               <section className="panel trend-panel trend-panel-large"><div className="panel-heading"><div><div className="panel-kicker">EXAMPLE MEASUREMENT</div><h2>Haemoglobin (HGB)</h2><p>Illustrative values from June to November.</p></div><span className="trend-chip">6 synthetic points</span></div><div className="trend-summary"><div><span className="trend-number">13.4 <small>g/dL</small></span><span className="trend-subtext">Example latest value · 12 Nov 2026</span></div><div className="trend-change"><ArrowUpRight size={15} /> +0.8 <small>across sample period</small></div></div><TrendChart /><div className="chart-disclaimer"><Info size={13} /> No health status, diagnosis or treatment implication can be inferred from this fabricated chart.</div></section>
               <div className="panel trend-method"><div className="panel-kicker">COMPARISON RULES WE ARE BUILDING</div><div className="method-grid"><div><CircleCheck size={17} /><strong>Match the test</strong><p>Compare equivalent measurements, not just similar labels.</p></div><div><CircleCheck size={17} /><strong>Normalize carefully</strong><p>Preserve the original unit and document any conversion.</p></div><div><CircleCheck size={17} /><strong>Keep the range</strong><p>Retain the reference interval from each reporting laboratory.</p></div></div></div>

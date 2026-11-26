@@ -86,6 +86,19 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
 
   const allCandidatesConfirmed = candidates.length > 0 && candidates.every((candidate) => candidate.confirmed);
 
+  const updateCandidate = (
+    id: string,
+    field: "reviewedTestName" | "reviewedValueAsReported" | "reviewedUnitAsReported" | "reviewedReferenceAsReported",
+    value: string,
+  ) => {
+    setCandidates((current) =>
+      current.map((candidate) =>
+        candidate.id === id ? { ...candidate, [field]: value, confirmed: false } : candidate,
+      ),
+    );
+    setReviewed(false);
+  };
+
   const confirmReview = () => {
     if (!text.trim() || !allCandidatesConfirmed) return;
     setReviewed(true);
@@ -212,15 +225,46 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
                                 />
                                 <div className="candidate-card-body">
                                   <div className="candidate-card-top">
-                                    <strong>{candidate.testName}</strong>
+                                    <strong>Review extracted observation</strong>
                                     <span>Page {candidate.page} · line {candidate.line}</span>
                                   </div>
-                                  <div className="candidate-values">
-                                    <span><small>REPORTED VALUE</small><strong>{candidate.valueAsReported}</strong></span>
-                                    <span><small>UNIT</small><strong>{candidate.unitAsReported || "Not captured"}</strong></span>
-                                    <span><small>PRINTED RANGE</small><strong>{candidate.referenceAsReported || "Not found"}</strong></span>
+                                  <label className="candidate-field candidate-name-field">
+                                    <small>TEST NAME</small>
+                                    <input
+                                      className="candidate-edit-input"
+                                      value={candidate.reviewedTestName}
+                                      onChange={(event) => updateCandidate(candidate.id, "reviewedTestName", event.target.value)}
+                                    />
+                                  </label>
+                                  <div className="candidate-values candidate-edit-values">
+                                    <label className="candidate-field">
+                                      <small>REPORTED VALUE</small>
+                                      <input
+                                        className="candidate-edit-input"
+                                        value={candidate.reviewedValueAsReported}
+                                        onChange={(event) => updateCandidate(candidate.id, "reviewedValueAsReported", event.target.value)}
+                                      />
+                                    </label>
+                                    <label className="candidate-field">
+                                      <small>UNIT</small>
+                                      <input
+                                        className="candidate-edit-input"
+                                        value={candidate.reviewedUnitAsReported}
+                                        placeholder="Missing"
+                                        onChange={(event) => updateCandidate(candidate.id, "reviewedUnitAsReported", event.target.value)}
+                                      />
+                                    </label>
+                                    <label className="candidate-field">
+                                      <small>PRINTED RANGE</small>
+                                      <input
+                                        className="candidate-edit-input"
+                                        value={candidate.reviewedReferenceAsReported}
+                                        placeholder="Not captured"
+                                        onChange={(event) => updateCandidate(candidate.id, "reviewedReferenceAsReported", event.target.value)}
+                                      />
+                                    </label>
                                   </div>
-                                  <p>{candidate.rawLine}</p>
+                                  <div className="candidate-source-line"><span>ORIGINAL SOURCE LINE</span><p>{candidate.rawLine}</p></div>
                                 </div>
                               </label>
                             ))}

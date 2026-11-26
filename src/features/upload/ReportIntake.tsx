@@ -214,10 +214,11 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
                         ) : (
                           <div className="candidate-list">
                             {candidates.map((candidate) => (
-                              <label className={candidate.confirmed ? "candidate-card candidate-card-confirmed" : "candidate-card"} key={candidate.id}>
+                              <div className={candidate.confirmed ? "candidate-card candidate-card-confirmed" : "candidate-card"} key={candidate.id} role="group" aria-label={"Review " + candidate.testName + " candidate"}>
                                 <input
                                   type="checkbox"
                                   checked={candidate.confirmed}
+                                  aria-label={"Confirm " + candidate.reviewedTestName + " extraction"}
                                   onChange={(event) => {
                                     setCandidates((current) => current.map((item) => item.id === candidate.id ? { ...item, confirmed: event.target.checked } : item));
                                     setReviewed(false);
@@ -266,7 +267,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
                                   </div>
                                   <div className="candidate-source-line"><span>ORIGINAL SOURCE LINE</span><p>{candidate.rawLine}</p></div>
                                 </div>
-                              </label>
+                              </div>
                             ))}
                           </div>
                         )}

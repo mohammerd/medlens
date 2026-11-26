@@ -254,7 +254,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
           <button
             className="button-primary"
             disabled={!file || !reviewed}
-            onClick={() => { onClose(); onNotice("Local review complete", "Your text review is only held in this browser session. It has not been saved or sent anywhere."); }}
+            onClick={() => { onClose(); onNotice("Local review complete", "The file and extracted text were discarded when this dialog closed. Nothing was saved or sent anywhere."); }}
           >
             Confirm local review <Check size={15} />
           </button>

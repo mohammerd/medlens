@@ -1,17 +1,17 @@
 import { useMemo, useRef, useState } from "react";
 import {
   Activity,
-  AlertCircle,
+  CircleAlert,
   ArrowRight,
   ArrowUpRight,
   Bell,
   BookOpen,
   Check,
-  CheckCircle2,
+  CircleCheck,
   ChevronDown,
   ChevronRight,
   CircleHelp,
-  FileCheck2,
+  FileCheck,
   FileText,
   FlaskConical,
   FolderOpen,
@@ -20,7 +20,7 @@ import {
   LockKeyhole,
   Menu,
   Moon,
-  MoreHorizontal,
+  Ellipsis,
   Plus,
   Search,
   Settings2,
@@ -66,8 +66,8 @@ function StatusPill({ status }: { status: LabReport["status"] }) {
 }
 
 function ResultStatus({ status }: { status: LabResult["status"] }) {
-  if (status === "within") return <span className="result-status result-ok"><CheckCircle2 size={13} /> Within example range</span>;
-  if (status === "review") return <span className="result-status result-review"><AlertCircle size={13} /> Verify result</span>;
+  if (status === "within") return <span className="result-status result-ok"><CircleCheck size={13} /> Within example range</span>;
+  if (status === "review") return <span className="result-status result-review"><CircleAlert size={13} /> Verify result</span>;
   return <span className="result-status result-muted"><Info size={13} /> Not available</span>;
 }
 
@@ -195,7 +195,7 @@ function App() {
           <div className="profile-row">
             <div className="profile-avatar">MD</div>
             <div className="profile-meta"><strong>Demo patient</strong><span>Prototype account</span></div>
-            <MoreHorizontal size={18} className="muted-icon" />
+            <Ellipsis size={18} className="muted-icon" />
           </div>
         </div>
       </aside>
@@ -232,7 +232,7 @@ function App() {
 
               <section className="metric-grid" aria-label="Workspace summary">
                 <div className="metric-card"><div className="metric-top"><span>Reports in workspace</span><div className="metric-icon metric-icon-sage"><FileText size={17} /></div></div><div className="metric-value">03</div><div className="metric-foot"><span className="metric-neutral"><FolderOpen size={13} /> Example records</span><span className="metric-caption">Synthetic data</span></div></div>
-                <div className="metric-card"><div className="metric-top"><span>Results to verify</span><div className="metric-icon metric-icon-amber"><AlertCircle size={17} /></div></div><div className="metric-value">01</div><div className="metric-foot"><span className="metric-neutral">Manual review queue</span><span className="metric-caption">Demo only</span></div></div>
+                <div className="metric-card"><div className="metric-top"><span>Results to verify</span><div className="metric-icon metric-icon-amber"><CircleAlert size={17} /></div></div><div className="metric-value">01</div><div className="metric-foot"><span className="metric-neutral">Manual review queue</span><span className="metric-caption">Demo only</span></div></div>
                 <div className="metric-card"><div className="metric-top"><span>Tracked measurements</span><div className="metric-icon metric-icon-blue"><Activity size={17} /></div></div><div className="metric-value">06</div><div className="metric-foot"><span className="metric-neutral"><TrendingUp size={13} /> Example timeline</span><span className="metric-caption">Not clinical data</span></div></div>
                 <div className="metric-card metric-card-dark"><div className="metric-top"><span>Evidence coverage</span><div className="metric-icon metric-icon-dark"><BookOpen size={17} /></div></div><div className="metric-value">—</div><div className="metric-foot"><span className="metric-neutral">Source connectors</span><span className="metric-caption">Not configured</span></div></div>
               </section>
@@ -260,7 +260,7 @@ function App() {
                 <div className="right-rail">
                   <div className="panel review-panel">
                     <div className="panel-heading compact-heading"><div><div className="panel-kicker">ATTENTION</div><h2>Review queue</h2></div><span className="queue-count">01</span></div>
-                    <div className="review-item"><div className="review-icon"><AlertCircle size={17} /></div><div className="review-copy"><strong>One result needs checking</strong><p>Lipid Profile · Reference interval requires confirmation in this sample record.</p><button onClick={() => openReport(demoReports[1])}>Review report <ArrowRight size={13} /></button></div></div>
+                    <div className="review-item"><div className="review-icon"><CircleAlert size={17} /></div><div className="review-copy"><strong>One result needs checking</strong><p>Lipid Profile · Reference interval requires confirmation in this sample record.</p><button onClick={() => openReport(demoReports[1])}>Review report <ArrowRight size={13} /></button></div></div>
                     <div className="review-note"><Info size={14} /><span>This is a simulated workflow. It does not identify a real health risk.</span></div>
                   </div>
                   <div className="panel getting-started">
@@ -293,7 +293,7 @@ function App() {
               <section className="page-heading"><div><div className="eyebrow">LONGITUDINAL INTELLIGENCE</div><h1>Measurement trends<span className="heading-period">.</span></h1><p>Explore how MEDLENS will compare compatible measurements across reports.</p></div><span className="prototype-tag"><History size={14} /> Synthetic timeline</span></section>
               <div className="insight-banner"><div className="insight-banner-icon"><Info size={18} /></div><div><strong>Comparisons need context.</strong><p>Different laboratories, methods, units and reference intervals can make two results non-comparable. This prototype chart uses fabricated values only.</p></div></div>
               <section className="panel trend-panel trend-panel-large"><div className="panel-heading"><div><div className="panel-kicker">EXAMPLE MEASUREMENT</div><h2>Haemoglobin (HGB)</h2><p>Illustrative values from June to November.</p></div><span className="trend-chip">6 synthetic points</span></div><div className="trend-summary"><div><span className="trend-number">13.4 <small>g/dL</small></span><span className="trend-subtext">Example latest value · 12 Nov 2026</span></div><div className="trend-change"><ArrowUpRight size={15} /> +0.8 <small>across sample period</small></div></div><TrendChart /><div className="chart-disclaimer"><Info size={13} /> No health status, diagnosis or treatment implication can be inferred from this fabricated chart.</div></section>
-              <div className="panel trend-method"><div className="panel-kicker">COMPARISON RULES WE ARE BUILDING</div><div className="method-grid"><div><CheckCircle2 size={17} /><strong>Match the test</strong><p>Compare equivalent measurements, not just similar labels.</p></div><div><CheckCircle2 size={17} /><strong>Normalize carefully</strong><p>Preserve the original unit and document any conversion.</p></div><div><CheckCircle2 size={17} /><strong>Keep the range</strong><p>Retain the reference interval from each reporting laboratory.</p></div></div></div>
+              <div className="panel trend-method"><div className="panel-kicker">COMPARISON RULES WE ARE BUILDING</div><div className="method-grid"><div><CircleCheck size={17} /><strong>Match the test</strong><p>Compare equivalent measurements, not just similar labels.</p></div><div><CircleCheck size={17} /><strong>Normalize carefully</strong><p>Preserve the original unit and document any conversion.</p></div><div><CircleCheck size={17} /><strong>Keep the range</strong><p>Retain the reference interval from each reporting laboratory.</p></div></div></div>
             </>
           )}
 
@@ -337,7 +337,7 @@ function App() {
             <div className="result-list">
               {reportResults.map((result) => <button className={`result-row ${selectedResult.id === result.id ? "result-row-active" : ""}`} key={result.id} onClick={() => setSelectedResult(result)}><div><strong>{result.name}</strong><span>{result.shortName} · Reference: {result.reference}</span></div><div className="result-value"><strong>{result.value}</strong><span>{result.unit}</span></div><ResultStatus status={result.status} /><ChevronRight size={16} /></button>)}
             </div>
-            <div className="result-explanation"><div className="explanation-title"><div className="explanation-icon"><BookOpen size={16} /></div><div><span>PLAIN-LANGUAGE CONTEXT</span><strong>{selectedResult.name}</strong></div></div><p>{selectedResult.explanation}</p><div className="source-link"><FileCheck2 size={15} /><div><span>DEMO SOURCE LOCATION</span><strong>{selectedResult.source}</strong></div><span className="source-unverified">Not verified</span></div></div>
+            <div className="result-explanation"><div className="explanation-title"><div className="explanation-icon"><BookOpen size={16} /></div><div><span>PLAIN-LANGUAGE CONTEXT</span><strong>{selectedResult.name}</strong></div></div><p>{selectedResult.explanation}</p><div className="source-link"><FileCheck size={15} /><div><span>DEMO SOURCE LOCATION</span><strong>{selectedResult.source}</strong></div><span className="source-unverified">Not verified</span></div></div>
             <div className="drawer-safety"><ShieldCheck size={17} /><div><strong>No diagnosis or clinical recommendation</strong><p>Values and explanatory text are synthetic. A qualified healthcare professional must interpret real results in context.</p></div></div>
             <div className="drawer-actions"><button className="button-secondary" onClick={() => { setSelectedReport(null); setView("Evidence library"); }}>Evidence approach <ArrowRight size={14} /></button><button className="button-primary" onClick={() => setSelectedReport(null)}>Done <Check size={15} /></button></div>
           </section>

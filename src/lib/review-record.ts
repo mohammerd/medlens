@@ -194,7 +194,6 @@ export function createReviewRecord(
   };
 }
 
-
 export interface ReviewRecordValidation {
   valid: boolean;
   errors: string[];

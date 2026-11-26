@@ -100,7 +100,7 @@ The backend should expose validated structured observations and provenance. The 
 - Clinical explanations and safety behaviour require review by qualified healthcare professionals before any patient-facing clinical pilot.
 - The project must not present an LLM-generated explanation as a diagnosis or treatment recommendation.
 
-See [SECURITY.md](SECURITY.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+See [SECURITY.md](SECURITY.md), [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/EXTRACTION_LIMITATIONS.md](docs/EXTRACTION_LIMITATIONS.md).
 
 ## License
 

@@ -12,7 +12,7 @@ This document describes the current frontend-only report workflow. It is an engi
 - Preserve page markers and extracted text lines in the review panel.
 - Run conservative label-at-line-start matching for a limited set of FBC, lipid and glucose test names.
 - Display the reported value, any text following it that resembles a unit, a printed numeric range when found, the raw matched line, and page/line position.
-- Highlight the approximate PDF.js text-fragment rectangles associated with a selected candidate on its original page.
+- Highlight the approximate PDF.js text-fragment rectangles associated with a selected candidate on its original page, but only when the candidate's normalized line text still matches the corresponding extracted PDF line. Editing the value or other source text disables that highlight rather than pointing to potentially stale coordinates.
 - Allow users to correct the detected test name, value, unit and printed interval while preserving the original source line.
 - Clear a row's confirmation whenever a correction is edited.
 - Require a user to check every detected candidate row before marking the review step complete.
@@ -32,7 +32,7 @@ This document describes the current frontend-only report workflow. It is an engi
 
 The detector is deliberately conservative. It matches known labels only at the beginning of an extracted text line and only creates a candidate when a numeric token follows. It tries to preserve the first numeric token, trailing unit text, a numeric interval if one appears later on the same line, the original line and an approximate page/line position.
 
-A source highlight is a navigation aid, not proof of extraction accuracy. A candidate is not a verified result. A matching label may still be wrong because of OCR/text-layer ordering, table structure, abbreviation collisions or unrelated text. The user must compare the entire raw line with the original document. The detector must never turn its output into a clinical interpretation.
+A source highlight is a navigation aid, not proof of extraction accuracy. It is attached only when page, line and normalized line text match the PDF extraction; case and whitespace differences are ignored, but content edits intentionally remove the highlight. A candidate is not a verified result. A matching label may still be wrong because of OCR/text-layer ordering, table structure, abbreviation collisions or unrelated text. The user must compare the entire raw line with the original document. The detector must never turn its output into a clinical interpretation.
 
 The supported labels are a starter list, not a clinical terminology catalogue. The aliases need to be tested against a legally usable, diverse corpus of laboratory reports before expanding support.
 

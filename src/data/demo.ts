@@ -113,6 +113,74 @@ export const demoResults: LabResult[] = [
   },
 ];
 
+
+export const demoLipidResults: LabResult[] = [
+  {
+    id: "total-cholesterol",
+    name: "Total cholesterol",
+    shortName: "TC",
+    value: "4.8",
+    unit: "mmol/L",
+    reference: "Not supplied",
+    status: "review",
+    explanation: "This measurement is part of a lipid profile. Its meaning depends on the laboratory method and the person's overall cardiovascular risk. The source interval is deliberately absent from this sample, so MEDLENS should not classify the value.",
+    source: "Page 1 · Lipid panel · Row 02",
+  },
+  {
+    id: "hdl",
+    name: "HDL cholesterol",
+    shortName: "HDL",
+    value: "1.3",
+    unit: "mmol/L",
+    reference: "Not supplied",
+    status: "unavailable",
+    explanation: "HDL is one of the cholesterol measurements in a lipid profile. Targets and interpretation depend on clinical context; this prototype does not provide a medical assessment.",
+    source: "Page 1 · Lipid panel · Row 03",
+  },
+  {
+    id: "ldl",
+    name: "LDL cholesterol",
+    shortName: "LDL",
+    value: "2.7",
+    unit: "mmol/L",
+    reference: "Not supplied",
+    status: "unavailable",
+    explanation: "LDL is another measurement in a lipid profile. A value should be considered with the full report and individual risk factors by a qualified professional.",
+    source: "Page 1 · Lipid panel · Row 04",
+  },
+];
+
+export const demoGlucoseResults: LabResult[] = [
+  {
+    id: "hba1c",
+    name: "HbA1c",
+    shortName: "HbA1c",
+    value: "5.6",
+    unit: "%",
+    reference: "Not supplied",
+    status: "unavailable",
+    explanation: "HbA1c reflects average blood glucose exposure over a period of time. The laboratory method, reporting standard and clinical context matter. No interpretation is provided in this demonstration.",
+    source: "Page 1 · Glycaemic panel · Row 01",
+  },
+  {
+    id: "glucose",
+    name: "Glucose",
+    shortName: "GLU",
+    value: "5.1",
+    unit: "mmol/L",
+    reference: "Not supplied",
+    status: "unavailable",
+    explanation: "Blood glucose is interpreted differently depending on whether the sample was fasting, random or collected after a glucose challenge. That context is not supplied in this sample record.",
+    source: "Page 1 · Glycaemic panel · Row 02",
+  },
+];
+
+export const demoResultsByReport: Record<string, LabResult[]> = {
+  "report-cbc-01": demoResults,
+  "report-lipid-01": demoLipidResults,
+  "report-glucose-01": demoGlucoseResults,
+};
+
 export const trendPoints = [
   { label: "Jun", value: 12.6 },
   { label: "Jul", value: 12.4 },

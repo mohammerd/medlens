@@ -27,7 +27,7 @@ const TESTS = [
   { key: "fasting-glucose", name: "Fasting blood glucose", aliases: ["fasting blood glucose", "fasting blood sugar", "fasting glucose", "fbs"] },
   { key: "random-glucose", name: "Random blood glucose", aliases: ["random blood glucose", "random blood sugar", "rbs"] },
   { key: "glucose", name: "Glucose", aliases: ["blood glucose", "glucose"] },
-  { key: "hba1c", name: "HbA1c", aliases: ["glycated haemoglobin", "glycated hemoglobin", "hba1c"] },
+  { key: "hba1c", name: "HbA1c", aliases: ["glycated haemoglobin", "glycated hemoglobin", "haemoglobin a1c", "hemoglobin a1c", "hba1c"] },
 ] as const;
 
 const ALIASES = TESTS.flatMap((test) =>

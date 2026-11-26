@@ -10,7 +10,7 @@ import {
   CircleCheck,
   ChevronDown,
   ChevronRight,
-  CircleHelp,
+  CircleQuestionMark,
   FileCheck,
   FileText,
   FlaskConical,
@@ -168,7 +168,7 @@ function App() {
         <Settings2 size={17} /><span>Settings</span>
       </button>
       <button className="nav-item" onClick={() => announce("Help centre", "Documentation and support links are being prepared.")}>
-        <CircleHelp size={17} /><span>Help centre</span>
+        <CircleQuestionMark size={17} /><span>Help centre</span>
       </button>
     </>
   );

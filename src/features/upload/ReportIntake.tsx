@@ -5,6 +5,7 @@ import type { PdfTextExtraction } from "../../lib/pdf";
 import { detectObservationCandidates, type ObservationCandidate } from "../../lib/candidate-extraction";
 import { attachPdfSourceBounds } from "../../lib/source-linking";
 import { buildReviewSummary, createReviewRecord, validateReviewRecord } from "../../lib/review-record";
+import { createFhirR4ObservationBundle } from "../../lib/fhir-export";
 import SourcePdfViewer from "./SourcePdfViewer";
 
 type Props = {
@@ -149,6 +150,45 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
     link.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 1500);
     onNotice("Review record downloaded", "The JSON includes report measurements and source text. Keep it private; use synthetic reports only in this prototype.");
+  };
+
+  const downloadFhirObservationBundle = () => {
+    if (!file || !reviewed || !allCandidatesConfirmed) return;
+
+    const record = createReviewRecord(
+      candidates,
+      {
+        mediaType: file.type,
+        fileSizeBytes: file.size,
+        sourceMode: isPdf ? "pdf-selectable-text" : "manual-transcription",
+        totalPages: extraction?.totalPages ?? null,
+        pagesRead: extraction?.pagesRead ?? null,
+        truncated: extraction?.truncated ?? false,
+      },
+      extraction,
+    );
+
+    try {
+      const bundle = createFhirR4ObservationBundle(record);
+      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: "application/fhir+json" });
+      const url = URL.createObjectURL(blob);
+      const link = window.document.createElement("a");
+      link.href = url;
+      link.download = `medlens-fhir-r4-observations-${new Date().toISOString().slice(0, 10)}.json`;
+      window.document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+      onNotice(
+        "FHIR R4 export downloaded",
+        "The bundle contains confirmed observations and source notes, but no patient identity or clinical interpretation. Keep it private and use synthetic reports only.",
+      );
+    } catch (caught) {
+      onNotice(
+        "FHIR export blocked",
+        caught instanceof Error ? caught.message : "The reviewed record could not be converted to FHIR R4.",
+      );
+    }
   };
 
   const canEditText = (isPdf && state === "done") || isImage;
@@ -386,10 +426,15 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
                       </div>
                       <div className="review-confirm-actions">
                         <button className="button-secondary" disabled={!allCandidatesConfirmed || reviewed} onClick={confirmReview}>{reviewed ? "Reviewed" : "Confirm review"}</button>
-                        {reviewed && <button className="button-secondary review-export-button" onClick={downloadReviewRecord}><Download size={13} /> Download JSON</button>}
+                        {reviewed && (
+                          <>
+                            <button className="button-secondary review-export-button" onClick={downloadReviewRecord}><Download size={13} /> Download JSON</button>
+                            <button className="button-secondary review-export-button" onClick={downloadFhirObservationBundle} title="Export the confirmed rows as a FHIR R4 collection">FHIR R4</button>
+                          </>
+                        )}
                       </div>
                     </div>
-                    {reviewed && <p className="review-export-caution">The JSON contains extracted measurements and source text. Keep the downloaded file private. This prototype is for synthetic data only.</p>}
+                    {reviewed && <p className="review-export-caution">JSON and FHIR exports contain report-derived measurements and source text. Keep downloaded files private. FHIR output contains individual observations only; it does not invent patient identity or report context. Use synthetic data only.</p>}
                   </>
                 )}
                 {isPdf && state === "error" && <button className="button-secondary retry-extract" onClick={extractLocally}>Try PDF extraction again</button>}
@@ -401,7 +446,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
 
         <div className="upload-local-note">
           <LockKeyhole size={15} />
-          <span><strong>Local-only prototype.</strong> PDF text extraction runs in your browser. A reviewed JSON record can be downloaded to this device, but no report is uploaded or stored by MEDLENS. No OCR or medical interpretation occurs. Use synthetic reports only.</span>
+          <span><strong>Local-only prototype.</strong> PDF text extraction runs in your browser. Reviewed JSON and FHIR R4 observation exports are downloaded to this device; no report is uploaded or stored by MEDLENS. No OCR or medical interpretation occurs. Use synthetic reports only.</span>
         </div>
         <div className="modal-actions">
           <button className="button-secondary" onClick={onClose}>Close</button>

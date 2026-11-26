@@ -67,6 +67,14 @@ describe("detectObservationCandidates", () => {
     expect(rows).toHaveLength(0);
   });
 
+  it("preserves comparator symbols and decimal commas without normalizing them", () => {
+    const [row] = detectObservationCandidates("Haemoglobin > 12,5 g/dL");
+
+    expect(row.valueAsReported).toBe(">12,5");
+    expect(row.unitAsReported).toBe("g/dL");
+    expect(row.referenceAsReported).toBeNull();
+  });
+
   it("preserves the complete matched source line", () => {
     const line = "MCV 88 fL 80-100";
     const [row] = detectObservationCandidates(line);

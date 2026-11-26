@@ -36,7 +36,7 @@ The frontend will consume a versioned API contract. It will not calculate diagno
 
 ## Run locally
 
-Requirements: Node.js 20.19+ or 22.12+ and npm.
+Requirements: Node.js 20.19+ or 22.12+ and npm. The CI workflow uses Node.js 24.
 
 ```bash
 npm install
@@ -49,6 +49,7 @@ Validate the application:
 
 ```bash
 npm run typecheck
+npm test
 npm run build
 ```
 
@@ -57,12 +58,15 @@ npm run build
 - Responsive research-product dashboard.
 - Overview, reports, trends and evidence-library navigation.
 - Synthetic example report with source traceability concept.
-- Local file picker and drag-and-drop affordance.
+- Local PDF preview and selectable-text extraction in the browser.
+- Conservative candidate-row detection for selected CBC, lipid and glucose labels.
+- Manual confirmation of each detected row against the original document.
+- Image preview with manual transcription; image OCR is not implemented.
 - Light/dark appearance toggle.
 - Versioned frontend/backend data-contract draft.
 - Search and interactive report preview.
 
-**Important:** selecting a file currently displays its name only. No OCR, upload, AI interpretation, account system or medical-data persistence is connected yet.
+**Important:** PDF extraction reads selectable text only; scanned PDFs require OCR, and images currently use manual transcription. Candidate detection is a conservative text-pattern experiment, not validated clinical extraction. No file upload, AI interpretation, account system or medical-data persistence is connected yet.
 
 ## Planned architecture
 

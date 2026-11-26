@@ -31,7 +31,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { demoReports, demoResults, trendPoints, type LabReport, type LabResult } from "./data/demo";
+import { demoReports, demoResultsByReport, trendPoints, type LabReport, type LabResult } from "./data/demo";
 import { formatBytes } from "./lib/format";
 
 type View = "Overview" | "Reports" | "Trends" | "Evidence library";
@@ -116,6 +116,8 @@ function App() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
+  const reportResults = selectedReport ? (demoResultsByReport[selectedReport.id] ?? []) : [];
+
   const filteredReports = useMemo(
     () => demoReports.filter((report) => `${report.title} ${report.category} ${report.laboratory}`.toLowerCase().includes(query.toLowerCase())),
     [query],
@@ -128,7 +130,7 @@ function App() {
 
   const openReport = (report: LabReport) => {
     setSelectedReport(report);
-    setSelectedResult(demoResults[0]);
+    setSelectedResult(demoResultsByReport[report.id]?.[0] ?? demoResultsByReport["report-cbc-01"][0]);
   };
 
   const handleFile = (file?: File) => {
@@ -331,9 +333,9 @@ function App() {
           <section className="report-drawer" role="dialog" aria-modal="true" aria-labelledby="report-title">
             <div className="drawer-header"><div><div className="panel-kicker">SAMPLE REPORT · {selectedReport.date.toUpperCase()}</div><h2 id="report-title">{selectedReport.title}</h2><p>{selectedReport.laboratory} · {selectedReport.category}</p></div><button className="icon-button" aria-label="Close report" onClick={() => setSelectedReport(null)}><X size={18} /></button></div>
             <div className="drawer-demo-note"><Info size={15} /><span>This is synthetic demonstration data, not a real laboratory report or medical interpretation.</span></div>
-            <div className="drawer-section-heading"><strong>Extracted result examples</strong><span>4 of {selectedReport.results} shown</span></div>
+            <div className="drawer-section-heading"><strong>Extracted result examples</strong><span>{reportResults.length} sample values</span></div>
             <div className="result-list">
-              {demoResults.map((result) => <button className={`result-row ${selectedResult.id === result.id ? "result-row-active" : ""}`} key={result.id} onClick={() => setSelectedResult(result)}><div><strong>{result.name}</strong><span>{result.shortName} · Reference: {result.reference} {result.unit}</span></div><div className="result-value"><strong>{result.value}</strong><span>{result.unit}</span></div><ChevronRight size={16} /></button>)}
+              {reportResults.map((result) => <button className={`result-row ${selectedResult.id === result.id ? "result-row-active" : ""}`} key={result.id} onClick={() => setSelectedResult(result)}><div><strong>{result.name}</strong><span>{result.shortName} · Reference: {result.reference}</span></div><div className="result-value"><strong>{result.value}</strong><span>{result.unit}</span></div><ResultStatus status={result.status} /><ChevronRight size={16} /></button>)}
             </div>
             <div className="result-explanation"><div className="explanation-title"><div className="explanation-icon"><BookOpen size={16} /></div><div><span>PLAIN-LANGUAGE CONTEXT</span><strong>{selectedResult.name}</strong></div></div><p>{selectedResult.explanation}</p><div className="source-link"><FileCheck2 size={15} /><div><span>DEMO SOURCE LOCATION</span><strong>{selectedResult.source}</strong></div><span className="source-unverified">Not verified</span></div></div>
             <div className="drawer-safety"><ShieldCheck size={17} /><div><strong>No diagnosis or clinical recommendation</strong><p>Values and explanatory text are synthetic. A qualified healthcare professional must interpret real results in context.</p></div></div>

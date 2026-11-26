@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ObservationCandidate } from "./candidate-extraction";
-import { buildReviewSummary, createReviewRecord } from "./review-record";
+import { buildReviewSummary, createReviewRecord, validateReviewRecord } from "./review-record";
 
 const rectangle = { x: 0.1, y: 0.2, width: 0.3, height: 0.04 };
 
@@ -150,5 +150,68 @@ describe("createReviewRecord", () => {
       "2026-11-26T17:00:00.000Z",
     );
     expect(record.reviewStatus).toBe("incomplete");
+  });
+});
+
+
+describe("validateReviewRecord", () => {
+  it("accepts a complete record that preserves its summary and provenance", () => {
+    const record = createReviewRecord([candidate()], documentMetadata, null, "2026-11-26T17:00:00.000Z");
+
+    expect(validateReviewRecord(record)).toEqual({ valid: true, errors: [] });
+  });
+
+  it("rejects inconsistent counts, status and highlight geometry", () => {
+    const record = createReviewRecord([candidate()], documentMetadata, null, "2026-11-26T17:00:00.000Z");
+    const tampered = {
+      ...record,
+      reviewStatus: "incomplete" as const,
+      summary: { ...record.summary, confirmedCount: 0 },
+      observations: record.observations.map((observation) => ({
+        ...observation,
+        source: {
+          ...observation.source,
+          highlightBounds: [{ x: 0.9, y: 0.2, width: 0.3, height: 0.04 }],
+        },
+      })),
+    };
+
+    const validation = validateReviewRecord(tampered);
+
+    expect(validation.valid).toBe(false);
+    expect(validation.errors).toContain("summary.confirmedCount does not match observations");
+    expect(validation.errors).toContain("observations[0].source.highlightBounds contains invalid page geometry");
+    expect(validation.errors).toContain("reviewStatus does not match the row confirmation states");
+  });
+
+  it("rejects duplicate observation IDs and impossible page counts", () => {
+    const record = createReviewRecord(
+      [candidate(), candidate({ id: "1-3-haemoglobin", line: 3 })],
+      documentMetadata,
+      null,
+      "2026-11-26T17:00:00.000Z",
+    );
+    const tampered = {
+      ...record,
+      document: { ...record.document, pagesRead: 3 },
+      observations: record.observations.map((observation) => ({ ...observation, id: "duplicate-id" })),
+    };
+
+    const validation = validateReviewRecord(tampered);
+
+    expect(validation.valid).toBe(false);
+    expect(validation.errors).toContain("Observation IDs must be unique");
+    expect(validation.errors).toContain("document.pagesRead cannot exceed document.totalPages");
+  });
+
+  it("accepts an incomplete record when its pending count and status agree", () => {
+    const record = createReviewRecord(
+      [candidate({ confirmed: false })],
+      documentMetadata,
+      null,
+      "2026-11-26T17:00:00.000Z",
+    );
+
+    expect(validateReviewRecord(record)).toEqual({ valid: true, errors: [] });
   });
 });

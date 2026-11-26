@@ -16,7 +16,7 @@ export type LabReport = {
   category: string;
   date: string;
   laboratory: string;
-  status: "Reviewed" | "Needs review" | "Demo";
+  status: "Example" | "Needs verification" | "Not connected";
   results: number;
   resultsNeedingReview: number;
   initials: string;
@@ -30,7 +30,7 @@ export const demoReports: LabReport[] = [
     category: "Haematology",
     date: "12 Nov 2026",
     laboratory: "Example Diagnostics",
-    status: "Reviewed",
+    status: "Example",
     results: 18,
     resultsNeedingReview: 0,
     initials: "FB",
@@ -42,7 +42,7 @@ export const demoReports: LabReport[] = [
     category: "Clinical chemistry",
     date: "04 Oct 2026",
     laboratory: "Example Diagnostics",
-    status: "Needs review",
+    status: "Needs verification",
     results: 6,
     resultsNeedingReview: 1,
     initials: "LP",
@@ -54,7 +54,7 @@ export const demoReports: LabReport[] = [
     category: "Clinical chemistry",
     date: "18 Aug 2026",
     laboratory: "Example Diagnostics",
-    status: "Demo",
+    status: "Not connected",
     results: 3,
     resultsNeedingReview: 0,
     initials: "GL",

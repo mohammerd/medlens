@@ -9,10 +9,12 @@ MEDLENS is being developed as an open-source research project. A completed inter
 - Responsive workspace with overview, report list, trends and evidence-library screens.
 - Local PDF/image selection and browser preview.
 - Selectable-text extraction from PDFs with Mozilla PDF.js.
+- Baseline-based PDF text grouping to restore visual rows before candidate matching.
 - Conservative candidate matching for a limited set of CBC, lipid and glucose/HbA1c labels.
-- Original raw-line, page/line, reported value, unit text and printed numeric interval shown for manual review.
-- Explicit confirmation required for each candidate row.
-- Five unit tests for candidate detection, source locations, common labels and abstention on unrecognized or incomplete lines.
+- Original source lines, page/line, reported value, unit text and printed numeric interval shown for manual review.
+- Editable correction fields for test name, value, unit and printed interval; edits clear the confirmation state.
+- Explicit confirmation required for every detected candidate row.
+- Synthetic FBC fixture plus 12 regression tests across candidate matching, PDF row grouping, source locations and unknown/incomplete lines.
 - Versioned frontend/backend API contract draft and GitHub Actions validation workflow.
 
 **Not yet verified:** a completed CI run or production build. The development environment could not reach GitHub/npm to install the project's dependencies. Do not mark this milestone build-verified until CI is green.
@@ -20,10 +22,10 @@ MEDLENS is being developed as an open-source research project. A completed inter
 ## Phase 1 — reliable local document review
 
 - Test PDF text extraction against synthetic fixtures from different PDF generators.
-- Improve line and table reconstruction while preserving original source text.
+- Improve table reconstruction across multiple laboratory PDF templates while preserving source text.
 - Add scanned-PDF and image OCR as a separately evaluated feature.
-- Store extraction candidates in a typed review model, including source coordinates when reliable.
-- Add correction UI for test name, value, unit and reference interval.
+- Store user-confirmed observations in a typed review model, including source coordinates when reliable.
+- Add durable, auditable review export only after privacy and retention requirements are defined.
 - Add regression tests for split columns, decimal commas, missing units, comparator values, multiple intervals and confusing labels.
 - Keep every candidate unclassified until its source data is confirmed.
 

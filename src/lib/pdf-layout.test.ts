@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { groupPositionedText } from "./pdf-layout";
+import { detectObservationCandidates } from "./candidate-extraction";
 
 describe("groupPositionedText", () => {
   it("joins fragments on the same visual baseline in left-to-right order", () => {
@@ -26,6 +27,30 @@ describe("groupPositionedText", () => {
       "Haemoglobin 13.4",
       "WBC 6.1",
     ]);
+  });
+
+  it("passes reconstructed laboratory rows into the candidate detector", () => {
+    const rows = groupPositionedText([
+      { text: "12.0-16.0", x: 320, y: 710 },
+      { text: "g/dL", x: 250, y: 710 },
+      { text: "13.4", x: 190, y: 710 },
+      { text: "Haemoglobin", x: 40, y: 710 },
+      { text: "WBC", x: 40, y: 690 },
+      { text: "6.1", x: 190, y: 690 },
+    ]);
+
+    const candidates = detectObservationCandidates(
+      "--- Page 1 ---\\n" + rows.map((row) => row.text).join("\\n"),
+    );
+
+    expect(candidates).toHaveLength(2);
+    expect(candidates[0]).toMatchObject({
+      testKey: "haemoglobin",
+      valueAsReported: "13.4",
+      unitAsReported: "g/dL",
+      referenceAsReported: "12.0-16.0",
+    });
+    expect(candidates[1].valueAsReported).toBe("6.1");
   });
 
   it("ignores empty text and non-finite coordinates", () => {

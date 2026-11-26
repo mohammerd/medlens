@@ -794,3 +794,51 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(105, 153, 11
   .candidate-values { grid-template-columns: 1fr 1fr; }
   .candidate-values > span:last-child { grid-column: 1 / -1; }
 }
+
+
+/* Editable candidate review fields */
+.candidate-card-body { display: flex; flex-direction: column; gap: 9px; }
+.candidate-name-field { max-width: 100%; }
+.candidate-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.candidate-field small, .candidate-source-line > span {
+  color: #9ba69b;
+  font-size: 6px;
+  font-weight: 700;
+  letter-spacing: .07em;
+}
+.candidate-edit-values { margin-top: 0; }
+.candidate-edit-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 30px;
+  padding: 5px 7px;
+  border: 1px solid #e4ebe1;
+  border-radius: 5px;
+  background: #fff;
+  color: #405244;
+  font: 600 8px ui-sans-serif, system-ui, sans-serif;
+}
+.candidate-edit-input:focus {
+  outline: none;
+  border-color: #91ad86;
+  box-shadow: 0 0 0 2px rgba(127,163,116,.12);
+}
+.candidate-source-line {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px dashed #e5ebe2;
+  padding-top: 7px;
+}
+.candidate-source-line p {
+  margin: 0;
+  color: #839084;
+  font: 7px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow-wrap: anywhere;
+}
+.theme-dark .candidate-edit-input {
+  background: #152219;
+  color: #d7e4d7;
+  border-color: #3b4e3e;
+}
+.theme-dark .candidate-source-line { border-color: #3b4b3d; }

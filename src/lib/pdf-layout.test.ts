@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupPositionedText, normalizeViewportRect } from "./pdf-layout";
+import { groupPositionedText, normalizePdfTextItemBounds, normalizeViewportRect } from "./pdf-layout";
 import { detectObservationCandidates } from "./candidate-extraction";
 
 describe("groupPositionedText", () => {
@@ -96,5 +96,30 @@ describe("groupPositionedText", () => {
     ], 2);
 
     expect(rows).toHaveLength(2);
+  });
+  it("transforms text bounds through a rotated PDF viewport", () => {
+    expect(normalizePdfTextItemBounds(10, 30, 20, 10, [0, 1, -1, 0, 100, 0], 100, 100)).toEqual({ x: 0.6, y: 0.1, width: 0.1, height: 0.2 });
+  });
+
+  it("returns null for invalid text-item geometry", () => {
+    expect(normalizePdfTextItemBounds(10, 30, 0, 10, [1, 0, 0, -1, 0, 100], 100, 100)).toBeNull();
+    expect(normalizePdfTextItemBounds(10, 30, 20, 10, [1, 0, 0, -1, 0, 100], 0, 100)).toBeNull();
+  });
+
+  it("groups fragments deterministically by nearest baseline", () => {
+    const items = [{ text: "interval", x: 250, y: 700, height: 10 }, { text: "Haemoglobin", x: 20, y: 700, height: 10 }, { text: "13.4", x: 150, y: 698.5, height: 8 }, { text: "WBC", x: 20, y: 684, height: 10 }, { text: "6.1", x: 150, y: 684, height: 10 }];
+    const expected = ["Haemoglobin 13.4 interval", "WBC 6.1"];
+    expect(groupPositionedText(items).map((row) => row.text)).toEqual(expected);
+    expect(groupPositionedText([...items].reverse()).map((row) => row.text)).toEqual(expected);
+  });
+
+  it("does not chain adjacent baselines into one oversized row", () => {
+    const rows = groupPositionedText([{ text: "first", x: 10, y: 100, height: 8 }, { text: "middle", x: 10, y: 97.5, height: 8 }, { text: "last", x: 10, y: 95, height: 8 }], 2);
+    expect(rows.map((row) => row.text)).toEqual(["first middle", "last"]);
+  });
+
+  it("normalizes whitespace in reconstructed rows", () => {
+    const rows = groupPositionedText([{ text: "Haemoglobin   ", x: 10, y: 100 }, { text: "  13.4  ", x: 120, y: 100 }]);
+    expect(rows[0].text).toBe("Haemoglobin 13.4");
   });
 });

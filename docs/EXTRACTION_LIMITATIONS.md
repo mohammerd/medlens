@@ -7,7 +7,8 @@ This document describes the current frontend-only report workflow. It is an engi
 - Select PDF, PNG, JPG or WebP files up to 15 MB.
 - Preview the selected file using a temporary browser object URL.
 - Read selectable text from PDF files with Mozilla PDF.js 6.x, in the browser.
-- Group PDF text fragments by approximate visual baseline before presenting page lines; this helps common table rows but is not complete table reconstruction.
+- Group PDF text fragments by nearest stable visual baseline with bounded font-size-aware tolerance and deterministic ordering; this helps common table rows but is not complete table reconstruction.
+- Transform text-fragment rectangles through the PDF.js viewport matrix, including rotated pages.
 - Preserve page markers and extracted text lines in the review panel.
 - Run conservative label-at-line-start matching for a limited set of FBC, lipid and glucose test names.
 - Display the reported value, any text following it that resembles a unit, a printed numeric range when found, the raw matched line, and page/line position.
@@ -22,7 +23,7 @@ This document describes the current frontend-only report workflow. It is an engi
 
 - It does not upload files, store report contents, call an API or use an LLM.
 - It does not OCR scanned PDFs or image reports. Images can only be previewed and manually transcribed at this stage.
-- Baseline grouping does not reliably reconstruct arbitrary laboratory tables, multi-column layouts, rotated pages, handwritten entries or split labels and values.
+- Baseline grouping does not reliably reconstruct arbitrary laboratory tables, multi-column layouts, handwritten entries or split labels and values. Rotated-page coordinates are transformed for highlighting, but the detector still does not understand rotated or multi-column table structure.
 - It does not normalize units, convert decimal separators, infer missing reference ranges or reconcile different laboratory methods.
 - It does not calculate high/low/normal flags, diagnose disease, estimate risk or recommend treatment.
 - It does not create server-persisted structured observations or audit records. JSON review exports are downloaded to the user's device and are not retained by the application.

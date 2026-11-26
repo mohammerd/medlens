@@ -27,8 +27,10 @@ MEDLENS is an open-source final-year research project exploring traceable, uncer
 ## Phase 1 — finish the frontend verification experience
 
 - Test the viewer against synthetic PDFs produced by more than one PDF generator.
-- Verify source highlights for different font sizes, page rotations and common report layouts.
-- Improve fallback behaviour when a PDF text layer has no usable geometry.
+- Group fragments by nearest stable visual baseline with bounded font-size-aware tolerance and deterministic ordering.
+- Transform text-fragment bounds through the PDF.js viewport matrix so rotated-page highlights remain correctly oriented.
+- Preserve readable text when geometry is missing while leaving source highlights unavailable.
+- Add regression coverage for mixed font sizes, shuffled fragment order, close rows, rotated geometry and whitespace.
 - Add a typed, exportable reviewed-observation record preserving original and reviewer-corrected values.
 - Add review summaries showing missing units, missing intervals, unreadable lines and conflicts without filling gaps automatically.
 - Keep every candidate unclassified until reviewed.

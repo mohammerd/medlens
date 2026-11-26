@@ -79,9 +79,14 @@ export default function SourcePdfViewer({
   return (
     <div className="source-pdf-viewer">
       <div className="source-pdf-toolbar">
-        <div className="source-pdf-page-count">
-          <FileText size={13} />
-          <span>PAGE {pageNumber} OF {displayPageCount}</span>
+        <div className="source-pdf-toolbar-meta">
+          <div className="source-pdf-page-count">
+            <FileText size={13} />
+            <span>DOCUMENT PREVIEW</span>
+          </div>
+          <div className="source-pdf-page-position">
+            <strong>{pageNumber}</strong><span>of {displayPageCount} pages</span>
+          </div>
         </div>
         <div className="source-pdf-page-controls">
           <button
@@ -103,6 +108,16 @@ export default function SourcePdfViewer({
             <ArrowRight size={14} />
           </button>
         </div>
+      </div>
+      <div
+        className="source-pdf-progress"
+        role="progressbar"
+        aria-label="PDF page position"
+        aria-valuemin={1}
+        aria-valuemax={displayPageCount}
+        aria-valuenow={pageNumber}
+      >
+        <span style={{ width: `${(pageNumber / displayPageCount) * 100}%` }} />
       </div>
 
       <div className="source-pdf-canvas">

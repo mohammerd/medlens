@@ -1102,3 +1102,81 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(105, 153, 11
   .review-confirm-actions { width: 100%; justify-content: stretch; }
   .review-confirm-actions .button-secondary { flex: 1; }
 }
+
+
+/* Refined PDF source viewer controls */
+.source-pdf-toolbar {
+  min-height: 56px;
+  padding: 8px 12px;
+  background: var(--surface);
+}
+.source-pdf-toolbar-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.source-pdf-page-count {
+  gap: 6px;
+  color: #789079;
+  font-size: 7px;
+  letter-spacing: .1em;
+}
+.source-pdf-page-position {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  color: #91a092;
+  font-size: 8px;
+}
+.source-pdf-page-position strong {
+  color: #405744;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.source-pdf-page-position span { color: #89988b; }
+.source-pdf-page-controls { gap: 6px; }
+.source-pdf-page-button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+.source-pdf-page-button:not(:disabled):hover {
+  border-color: #a9c29f;
+  background: #eef5eb;
+  transform: translateY(-1px);
+}
+.source-pdf-progress {
+  height: 3px;
+  overflow: hidden;
+  background: #e8eee6;
+}
+.source-pdf-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(90deg, #8eae7d, #527a51);
+  transition: width .2s ease;
+}
+.source-pdf-caption {
+  min-height: 42px;
+  padding: 10px 12px;
+  align-items: center;
+  background: var(--surface);
+}
+.source-pdf-caption svg { color: #789777; }
+.source-pdf-error { color: #a56d48; }
+.theme-dark .source-pdf-toolbar { background: var(--surface); }
+.theme-dark .source-pdf-page-position strong { color: #d4e4d1; }
+.theme-dark .source-pdf-page-position span,
+.theme-dark .source-pdf-page-count { color: #a8b9a8; }
+.theme-dark .source-pdf-page-button:not(:disabled):hover { background: #2b4030; border-color: #688562; }
+.theme-dark .source-pdf-progress { background: #304034; }
+@media (max-width: 420px) {
+  .source-pdf-toolbar { padding: 8px 10px; }
+  .source-pdf-page-controls { gap: 4px; }
+  .source-pdf-page-button { width: 28px; height: 28px; }
+}

@@ -1,6 +1,6 @@
 import * as pdfjs from "pdfjs-dist";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-import { groupPositionedText, normalizeViewportRect, type NormalizedRect } from "./pdf-layout";
+import { groupPositionedText, normalizePdfTextItemBounds, type NormalizedRect } from "./pdf-layout";
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
@@ -70,30 +70,9 @@ export async function extractPdfText(
           return [{ text: item.str, x, y: baselineY, width, height, bounds: null }];
         }
 
-        const [a, b, c, d, e, f] = viewport.transform;
-        const corners = [
-          [x, baselineY - height],
-          [x + width, baselineY - height],
-          [x, baselineY],
-          [x + width, baselineY],
-        ].map(([pointX, pointY]) => [
-          a * pointX + c * pointY + e,
-          b * pointX + d * pointY + f,
-        ]);
-        const viewportRect: [number, number, number, number] = [
-          Math.min(...corners.map((point) => point[0])),
-          Math.min(...corners.map((point) => point[1])),
-          Math.max(...corners.map((point) => point[0])),
-          Math.max(...corners.map((point) => point[1])),
-        ];
-
         return [{
-          text: item.str,
-          x,
-          y: baselineY,
-          width,
-          height,
-          bounds: normalizeViewportRect(viewportRect, viewport.width, viewport.height),
+          text: item.str, x, y: baselineY, width, height,
+          bounds: normalizePdfTextItemBounds(x, baselineY, width, height, viewport.transform, viewport.width, viewport.height),
         }];
       });
 

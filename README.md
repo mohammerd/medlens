@@ -59,7 +59,8 @@ npm run build
 - Overview, reports, trends and evidence-library navigation.
 - Synthetic example report with source traceability concept.
 - Local PDF preview, selectable-text extraction and approximate visual-row grouping in the browser.
-- Source-linked PDF page navigation with approximate highlights for detected observation text fragments.
+- Source-linked PDF page navigation with approximate highlights for detected observation text fragments, including viewport-transformed coordinates for rotated pages.
+- Deterministic nearest-baseline text grouping with bounded font-size-aware tolerance and regression tests for mixed sizes, shuffled fragments and close rows.
 - Conservative candidate-row detection for selected CBC, lipid and glucose labels.
 - Editable candidate fields with source-line preservation and per-row human confirmation.
 - Review-quality summary for missing units/intervals, unavailable source highlights, repeated labels with differing values, pages without selectable text and unmatched text lines.

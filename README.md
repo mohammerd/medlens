@@ -85,7 +85,7 @@ MEDLENS Backend (separate repository)
   +-- Evaluation and audit trail
 ```
 
-The backend should expose validated structured observations and provenance. The frontend should render them faithfully and make uncertainty understandable.
+The backend should expose validated structured observations and provenance. The frontend should render them faithfully and make uncertainty understandable. See [docs/API_CONTRACT.md](docs/API_CONTRACT.md) for the proposed v1 boundary.
 
 ## Safety and data policy
 

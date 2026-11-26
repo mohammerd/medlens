@@ -1,5 +1,6 @@
 import * as pdfjs from "pdfjs-dist";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import { groupPositionedText } from "./pdf-layout";
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
@@ -35,17 +36,20 @@ export async function extractPdfText(
     for (let pageNumber = 1; pageNumber <= pagesRead; pageNumber += 1) {
       const page = await document.getPage(pageNumber);
       const content = await page.getTextContent();
-      let pageText = "";
+      const positionedItems = content.items.flatMap((item) => {
+        if (!("str" in item) || typeof item.str !== "string") return [];
+        if (!("transform" in item) || !Array.isArray(item.transform) || item.transform.length < 6) return [];
 
-      for (const item of content.items) {
-        if (!("str" in item) || typeof item.str !== "string") continue;
-        pageText += item.str;
-        pageText += "hasEOL" in item && item.hasEOL ? "\n" : " ";
-      }
+        return [{
+          text: item.str,
+          x: Number(item.transform[4]),
+          y: Number(item.transform[5]),
+        }];
+      });
 
-      const normalized = pageText
-        .replace(/[ \t]+/g, " ")
-        .replace(/ *\n */g, "\n")
+      const normalized = groupPositionedText(positionedItems)
+        .map((row) => row.text)
+        .join("\n")
         .trim();
 
       if (normalized) {

@@ -14,6 +14,8 @@ MEDLENS is an open-source final-year research project exploring traceable, uncer
 - Preservation of original text, page/line, reported value, unit and printed numeric interval.
 - Editable candidate fields; every edit clears the row's confirmation state.
 - Explicit per-row human confirmation.
+- Review-quality summary for missing units and printed intervals, unavailable source highlights, repeated labels with differing values, pages without selectable text and unmatched lines.
+- Versioned JSON review export preserving extracted and corrected fields separately, source text, page/line provenance and normalized highlight bounds; export is a user-managed local download, not app persistence.
 - Approximate text-fragment rectangles retained in normalized page coordinates.
 - A local PDF page viewer with source navigation and highlight overlays for selected candidates.
 - Synthetic FBC fixture and 18 automated tests across candidate extraction, PDF row grouping, highlight geometry and exact page/line source linking.

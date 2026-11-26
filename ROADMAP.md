@@ -16,9 +16,10 @@ MEDLENS is an open-source final-year research project exploring traceable, uncer
 - Explicit per-row human confirmation.
 - Review-quality summary for missing units and printed intervals, unavailable source highlights, repeated labels with differing values, pages without selectable text and unmatched lines.
 - Versioned JSON review export preserving extracted and corrected fields separately, source text, page/line provenance and normalized highlight bounds; export is a user-managed local download, not app persistence.
+- Runtime validation before export checks schema/version, confirmation counts and status, unique observation IDs, page counts, source references and normalized highlight bounds. This checks record integrity, not clinical correctness.
 - Approximate text-fragment rectangles retained in normalized page coordinates.
 - A local PDF page viewer with source navigation and highlight overlays for selected candidates.
-- Synthetic FBC fixture and 18 automated tests across candidate extraction, PDF row grouping, highlight geometry and exact page/line source linking.
+- Synthetic FBC fixture and automated regression tests across candidate extraction, PDF row grouping, highlight geometry and exact page/line source linking.
 - Versioned frontend/backend API contract draft, extraction limitations and security/contribution documentation.
 - GitHub Actions validation: TypeScript, tests and production build passed on PR #2.
 
@@ -26,14 +27,9 @@ MEDLENS is an open-source final-year research project exploring traceable, uncer
 
 ## Phase 1 — finish the frontend verification experience
 
-- Test the viewer against synthetic PDFs produced by more than one PDF generator.
-- Group fragments by nearest stable visual baseline with bounded font-size-aware tolerance and deterministic ordering.
-- Transform text-fragment bounds through the PDF.js viewport matrix so rotated-page highlights remain correctly oriented.
-- Preserve readable text when geometry is missing while leaving source highlights unavailable.
-- Add regression coverage for mixed font sizes, shuffled fragment order, close rows, rotated geometry and whitespace.
-- Add a typed, exportable reviewed-observation record preserving original and reviewer-corrected values.
-- Add review summaries showing missing units, missing intervals, unreadable lines and conflicts without filling gaps automatically.
-- Keep every candidate unclassified until reviewed.
+**Status:** the core local review workflow, source navigation, review summaries, typed JSON export and export-integrity checks are implemented. The remaining manual verification task is to test the PDF viewer against synthetic documents produced by more than one PDF generator and record any geometry differences as regression fixtures. The automated layout suite already covers mixed font sizes, shuffled fragments, close rows, rotated geometry and whitespace.
+
+The exit criteria remain: a user can select a PDF, preview it, extract supported FBC rows, jump from each candidate to its approximate source text, correct fields, and complete a review with a reproducible local record. All failure states must remain visible.
 
 **Exit criteria:** a user can select a PDF, preview it, extract supported FBC rows, jump from each candidate to its approximate source text, correct fields, and complete a review with a reproducible local record. All failure states are visible.
 

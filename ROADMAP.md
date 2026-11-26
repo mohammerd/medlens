@@ -1,95 +1,101 @@
 # MEDLENS roadmap
 
-MEDLENS is being developed as an open-source research project. A completed interface is not evidence of medical validity. Each phase must be evaluated before the project moves toward patient-facing use.
+MEDLENS is an open-source final-year research project exploring traceable, uncertainty-aware explanations of medical laboratory reports. The goal is a rigorously evaluated prototype, not an all-purpose clinical product.
 
-## Current milestone — browser-local report review
+## Current milestone — source-linked local report review
 
 **Implemented in the frontend repository:**
 
-- Responsive workspace with overview, report list, trends and evidence-library screens.
-- Local PDF/image selection and browser preview.
-- Selectable-text extraction from PDFs with Mozilla PDF.js.
-- Baseline-based PDF text grouping to restore visual rows before candidate matching.
+- Responsive research workspace with overview, report library, trends and evidence-library screens.
+- Local PDF/image selection, preview and file-size/type checks.
+- Selectable-text extraction from PDFs with Mozilla PDF.js; scanned PDFs and image OCR are not implemented.
+- Approximate visual-row grouping before candidate detection.
 - Conservative candidate matching for a limited set of CBC, lipid and glucose/HbA1c labels.
-- Original source lines, page/line, reported value, unit text and printed numeric interval shown for manual review.
-- Editable correction fields for test name, value, unit and printed interval; edits clear the confirmation state.
-- Explicit confirmation required for every detected candidate row.
-- Synthetic FBC fixture plus 12 regression tests across candidate matching, PDF row grouping, source locations and unknown/incomplete lines.
-- Versioned frontend/backend API contract draft and GitHub Actions validation workflow.
+- Preservation of original text, page/line, reported value, unit and printed numeric interval.
+- Editable candidate fields; every edit clears the row's confirmation state.
+- Explicit per-row human confirmation.
+- Approximate text-fragment rectangles retained in normalized page coordinates.
+- A local PDF page viewer with source navigation and highlight overlays for selected candidates.
+- Synthetic FBC fixture and 18 automated tests across candidate extraction, PDF row grouping, highlight geometry and exact page/line source linking.
+- Versioned frontend/backend API contract draft, extraction limitations and security/contribution documentation.
+- GitHub Actions validation: TypeScript, tests and production build passed on PR #2.
 
-**Not yet verified:** a completed CI run or production build. The development environment could not reach GitHub/npm to install the project's dependencies. Do not mark this milestone build-verified until CI is green.
+**Not implemented:** OCR for scanned documents, backend integration, authentication, database persistence, evidence retrieval, or AI-generated explanations. Do not use real patient reports in this prototype.
 
-## Phase 1 — reliable local document review
+## Phase 1 — finish the frontend verification experience
 
-- Test PDF text extraction and highlight geometry against synthetic fixtures from different PDF generators.
-- Improve text-fragment bounds for rotated text, multi-column layouts and mixed font sizes.
-- Improve table reconstruction across multiple laboratory PDF templates while preserving source text.
-- Add scanned-PDF and image OCR as a separately evaluated feature.
-- Store user-confirmed observations in a typed review model, including source coordinates when reliable.
-- Add durable, auditable review export only after privacy and retention requirements are defined.
-- Add regression tests for split columns, decimal commas, missing units, comparator values, multiple intervals and confusing labels.
-- Keep every candidate unclassified until its source data is confirmed.
+- Test the viewer against synthetic PDFs produced by more than one PDF generator.
+- Verify source highlights for different font sizes, page rotations and common report layouts.
+- Improve fallback behaviour when a PDF text layer has no usable geometry.
+- Add a typed, exportable reviewed-observation record preserving original and reviewer-corrected values.
+- Add review summaries showing missing units, missing intervals, unreadable lines and conflicts without filling gaps automatically.
+- Keep every candidate unclassified until reviewed.
 
-Exit criteria: reproducible extraction metrics on a documented synthetic corpus, visible failure states and no silent guesses.
+**Exit criteria:** a user can select a PDF, preview it, extract supported FBC rows, jump from each candidate to its approximate source text, correct fields, and complete a review with a reproducible local record. All failure states are visible.
 
 ## Phase 2 — independent backend repository
 
-Create `medlens-backend` using Python and FastAPI.
+Create medlens-backend using Python and FastAPI.
 
 - Implement authenticated report ingestion and private object storage.
-- Create database migrations and per-user authorization policies.
-- Implement asynchronous document processing with file-size, type and page limits.
-- Add OCR/layout extraction and structured observation candidates.
-- Preserve original text, unit, reference interval, specimen and source location.
+- Add database migrations and per-user authorization policies.
+- Process documents asynchronously with file type, size and page limits.
+- Add OCR/layout extraction for scanned PDFs and images as a separately evaluated pipeline.
+- Preserve the original text, original value, unit, laboratory interval and source location.
 - Expose the agreed versioned API contract.
-- Implement deletion, retention, audit and privacy controls before real health data is accepted.
+- Implement report deletion, retention, audit logging and privacy controls before accepting identifiable health information.
 
-Exit criteria: backend integration tests, authorization tests, file isolation tests, deletion tests and documented threat model.
+**Exit criteria:** frontend/backend integration tests pass; authorization, file isolation and deletion tests pass; a threat model and data-retention policy are documented.
 
-## Phase 3 — independent benchmark and dataset
+## Phase 3 — constrained FBC explanation engine
 
-- Build a synthetic and appropriately licensed/de-identified laboratory report corpus.
-- Establish annotation guidance for test names, values, units, reference ranges and source coordinates.
-- Use independent annotators and adjudication for disagreements.
-- Publish benchmark schemas, splits, baselines and evaluation scripts.
-- Measure field-level precision, recall, exact match, calibration and subgroup/template failure rates.
-- Publish failure cases and limitations alongside aggregate results.
+Start with Full Blood Count only. Do not expand to every laboratory panel yet.
 
-Exit criteria: other researchers can reproduce the evaluation without accessing private patient data.
+- Create a reviewed catalogue of supported FBC tests, units and plain-language definitions.
+- Separate extracted facts from generated explanatory text.
+- Explain what each supported measurement represents, what the report itself says, and what cannot be concluded from that measurement alone.
+- Attach a versioned evidence reference to every factual medical claim.
+- Generate questions users can discuss with qualified healthcare professionals.
+- Abstain when the test is unsupported, the source is ambiguous, the unit or interval is missing, or required context is unavailable.
+- Do not diagnose, recommend medication, or advise treatment changes.
 
-## Phase 4 — evidence-grounded explanations
+**Exit criteria:** qualified laboratory and clinical reviewers assess the supported explanations, evidence links and abstention behaviour. Every limitation is documented.
 
-- Build a reviewed medical terminology and evidence catalogue.
-- Separate source facts from explanatory text.
-- Link every medical claim to a source and version.
-- Implement abstention when evidence, reference range or patient context is insufficient.
-- Add clinical review states with named reviewer roles and audit history.
-- Compare explanation quality and safety against non-evidence-grounded baselines.
+## Phase 4 — evaluation and final-year demonstration
 
-Exit criteria: qualified laboratory and clinical reviewers have evaluated the supported test scope and documented unresolved risk.
+- Build a versioned test set using synthetic and appropriately licensed/de-identified FBC reports.
+- Annotate test name, value, unit, interval and source location; adjudicate disagreements.
+- Measure field-level precision, recall and exact match separately. Report failures by document template and scan quality.
+- Test the explanation layer for evidence coverage, unsupported claims and appropriate abstention.
+- Conduct a small, approved usability study focused on whether people understand the report wording and know what to ask a healthcare professional.
+- Publish test fixtures, annotation guidance, evaluation scripts and a limitations report.
+- Demonstrate the complete flow: report input → extraction → source verification → plain-language explanation → questions for a healthcare professional.
 
-## Phase 5 — longitudinal laboratory comparison
+**Exit criteria:** the evaluation is reproducible, the demonstration works end to end, and known failure cases are visible. Results must be reported honestly; do not claim clinical validation from a software test or small dataset.
 
-- Match compatible tests across reports using terminology, method, specimen and unit context.
-- Preserve original values and display any normalized values as additional derived data.
-- Detect non-comparable results and refuse unsupported comparisons.
-- Evaluate trend calculations on synthetic time-series fixtures.
-- Avoid claiming clinical improvement or deterioration from numeric movement alone.
+## Final-year project stop line
 
-## Phase 6 — controlled institutional pilot
+For the school submission, stop after the Phase 4 demonstration and evaluation.
 
-Only after security, privacy, institutional ethics and qualified clinical review:
+The finished project should be a strong, complete vertical slice:
 
-- Run a limited pilot with informed participants and an approved protocol.
-- Keep clinician oversight and a clear escalation path.
-- Measure comprehension, extraction errors, usability and safety incidents.
-- Do not position MEDLENS as a diagnostic or treatment tool unless the intended-use and regulatory requirements have been separately assessed.
+1. **Frontend:** polished local report workflow, editable FBC candidates and PDF source highlights.
+2. **Backend:** secure API, storage, OCR and structured observations with provenance.
+3. **Intelligence:** evidence-grounded FBC explanations, questions for a healthcare professional and clear abstention.
+4. **Research:** documented dataset, field-level extraction evaluation, explanation review and usability findings.
+5. **Demonstration:** reproducible end-to-end flow with a clear installation guide and architecture documentation.
 
-## Non-goals for the early project
+Do not add voice assistants, multilingual support, wearables, hospital integrations, treatment recommendations, autonomous agents, broad multi-panel coverage or longitudinal prediction before this stop line is met. Those are future research directions, not requirements for the final-year deliverable.
+
+## Future research beyond the project
+
+After the final-year evaluation, possible extensions include additional report panels, carefully validated longitudinal comparisons, multilingual explanations and clinical/institutional pilots. Each requires its own evidence, safety, privacy and regulatory review.
+
+## Non-goals
 
 - Diagnosis or treatment recommendations.
 - Automatic reassurance that a result is safe.
 - A general medical chatbot.
-- Inference of missing laboratory units or reference ranges.
-- Training on identifiable patient records without lawful basis and appropriate approvals.
-- Claiming clinical accuracy from a small demo dataset or a successful software build.
+- Inference of missing laboratory units or reference intervals.
+- Training on identifiable patient records without a lawful basis and appropriate approvals.
+- Claims of clinical accuracy from a small demonstration or a successful CI run.

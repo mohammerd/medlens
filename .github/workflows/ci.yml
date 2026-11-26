@@ -24,5 +24,7 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: TypeScript validation
         run: npm run typecheck
+      - name: Candidate extraction tests
+        run: npm test
       - name: Production build
         run: npm run build

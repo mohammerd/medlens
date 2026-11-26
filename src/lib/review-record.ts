@@ -193,3 +193,188 @@ export function createReviewRecord(
     })),
   };
 }
+
+export interface ReviewRecordValidation {
+  valid: boolean;
+  errors: string[];
+}
+
+type UnknownObject = Record<string, unknown>;
+
+function isObject(value: unknown): value is UnknownObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isOptionalString(value: unknown): value is string | null {
+  return value === null || typeof value === "string";
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+}
+
+function isPositiveInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value > 0;
+}
+
+function isReviewRowReference(value: unknown): boolean {
+  return isObject(value)
+    && isNonEmptyString(value.id)
+    && isNonEmptyString(value.testName)
+    && isPositiveInteger(value.page)
+    && isPositiveInteger(value.line);
+}
+
+function isNormalizedRect(value: unknown): value is ObservationCandidate["sourceBounds"][number] {
+  if (!isObject(value)) return false;
+  const { x, y, width, height } = value;
+  if (
+    typeof x !== "number" || !Number.isFinite(x)
+    || typeof y !== "number" || !Number.isFinite(y)
+    || typeof width !== "number" || !Number.isFinite(width)
+    || typeof height !== "number" || !Number.isFinite(height)
+  ) return false;
+  return x >= 0 && y >= 0 && width > 0 && height > 0
+    && x + width <= 1.000001 && y + height <= 1.000001;
+}
+
+function validateObservation(value: unknown, index: number, errors: string[]): value is ReviewRecord["observations"][number] {
+  const prefix = `observations[${index}]`;
+  if (!isObject(value)) {
+    errors.push(`${prefix} must be an object`);
+    return false;
+  }
+
+  let valid = true;
+  if (!isNonEmptyString(value.id)) { errors.push(`${prefix}.id must be a non-empty string`); valid = false; }
+  if (!isNonEmptyString(value.testKey)) { errors.push(`${prefix}.testKey must be a non-empty string`); valid = false; }
+
+  for (const section of ["extracted", "reviewed"] as const) {
+    const fields = value[section];
+    if (!isObject(fields)) {
+      errors.push(`${prefix}.${section} must be an object`);
+      valid = false;
+      continue;
+    }
+    if (!isNonEmptyString(fields.testName)) { errors.push(`${prefix}.${section}.testName is required`); valid = false; }
+    if (typeof fields.valueAsReported !== "string") { errors.push(`${prefix}.${section}.valueAsReported must be text`); valid = false; }
+    if (!isOptionalString(fields.unitAsReported)) { errors.push(`${prefix}.${section}.unitAsReported must be text or null`); valid = false; }
+    if (!isOptionalString(fields.referenceIntervalAsReported)) { errors.push(`${prefix}.${section}.referenceIntervalAsReported must be text or null`); valid = false; }
+  }
+
+  const source = value.source;
+  if (!isObject(source)) {
+    errors.push(`${prefix}.source must be an object`);
+    valid = false;
+  } else {
+    if (!isPositiveInteger(source.page) || !isPositiveInteger(source.line)) {
+      errors.push(`${prefix}.source page and line must be positive integers`);
+      valid = false;
+    }
+    if (!isNonEmptyString(source.rawText)) { errors.push(`${prefix}.source.rawText is required`); valid = false; }
+    if (!Array.isArray(source.highlightBounds) || !source.highlightBounds.every(isNormalizedRect)) {
+      errors.push(`${prefix}.source.highlightBounds contains invalid page geometry`);
+      valid = false;
+    } else if (source.highlightAvailable !== (source.highlightBounds.length > 0)) {
+      errors.push(`${prefix}.source.highlightAvailable does not match its bounds`);
+      valid = false;
+    }
+  }
+
+  if (typeof value.confirmed !== "boolean") { errors.push(`${prefix}.confirmed must be boolean`); valid = false; }
+  return valid;
+}
+
+/**
+ * Validate the portable review-record contract before a JSON file is
+ * downloaded or passed to another system. This checks data integrity only;
+ * it does not establish extraction correctness or clinical validity.
+ */
+export function validateReviewRecord(value: unknown): ReviewRecordValidation {
+  const errors: string[] = [];
+  if (!isObject(value)) return { valid: false, errors: ["Review record must be a JSON object"] };
+
+  if (value.schema !== "medlens.review-record") errors.push("Unsupported review-record schema");
+  if (value.schemaVersion !== "1.0.0") errors.push("Unsupported review-record version");
+  if (typeof value.generatedAt !== "string" || !Number.isFinite(Date.parse(value.generatedAt))) {
+    errors.push("generatedAt must be a valid date-time string");
+  }
+  if (value.reviewMethod !== "in-browser-human-confirmation") errors.push("Unsupported review method");
+  if (value.reviewStatus !== "complete" && value.reviewStatus !== "incomplete") errors.push("Invalid review status");
+
+  const document = value.document;
+  if (!isObject(document)) {
+    errors.push("document must be an object");
+  } else {
+    if (!isNonEmptyString(document.mediaType)) errors.push("document.mediaType is required");
+    if (!isNonNegativeInteger(document.fileSizeBytes)) errors.push("document.fileSizeBytes must be a non-negative integer");
+    if (document.sourceMode !== "pdf-selectable-text" && document.sourceMode !== "manual-transcription") {
+      errors.push("Unsupported document source mode");
+    }
+    for (const key of ["totalPages", "pagesRead"] as const) {
+      const pageCount = document[key];
+      if (pageCount !== null && !isNonNegativeInteger(pageCount)) errors.push(`document.${key} must be a non-negative integer or null`);
+    }
+    if (document.totalPages !== null && document.pagesRead !== null
+      && isNonNegativeInteger(document.totalPages) && isNonNegativeInteger(document.pagesRead)
+      && document.pagesRead > document.totalPages) {
+      errors.push("document.pagesRead cannot exceed document.totalPages");
+    }
+    if (typeof document.truncated !== "boolean") errors.push("document.truncated must be boolean");
+  }
+
+  const observations = value.observations;
+  if (!Array.isArray(observations) || observations.length === 0) {
+    errors.push("observations must contain at least one reviewed candidate");
+  } else {
+    observations.forEach((observation, index) => validateObservation(observation, index, errors));
+    const ids = observations.filter(isObject).map((observation) => observation.id).filter((id): id is string => typeof id === "string");
+    if (new Set(ids).size !== ids.length) errors.push("Observation IDs must be unique");
+  }
+
+  const summary = value.summary;
+  if (!isObject(summary)) {
+    errors.push("summary must be an object");
+  } else {
+    const candidateCount = Array.isArray(observations) ? observations.length : -1;
+    const confirmedCount = Array.isArray(observations)
+      ? observations.filter((observation) => isObject(observation) && observation.confirmed === true).length
+      : -1;
+    if (summary.candidateCount !== candidateCount) errors.push("summary.candidateCount does not match observations");
+    if (summary.confirmedCount !== confirmedCount) errors.push("summary.confirmedCount does not match observations");
+    if (summary.pendingCount !== candidateCount - confirmedCount) errors.push("summary.pendingCount does not match observations");
+    for (const key of ["pagesWithoutSelectableText", "unmatchedSelectableLineCount"] as const) {
+      if (!isNonNegativeInteger(summary[key])) errors.push(`summary.${key} must be a non-negative integer`);
+    }
+    for (const key of ["missingUnitRows", "missingReferenceIntervalRows", "missingSourceHighlightRows"] as const) {
+      if (!Array.isArray(summary[key]) || !summary[key].every(isReviewRowReference)) {
+        errors.push(`summary.${key} contains an invalid row reference`);
+      }
+    }
+    if (!Array.isArray(summary.potentialConflicts) || !summary.potentialConflicts.every((conflict) =>
+      isObject(conflict)
+      && isNonEmptyString(conflict.key)
+      && isNonEmptyString(conflict.testKey)
+      && isNonEmptyString(conflict.testName)
+      && isPositiveInteger(conflict.page)
+      && Array.isArray(conflict.values)
+      && conflict.values.length > 1
+      && conflict.values.every((entry) => typeof entry === "string" && entry.length > 0)
+    )) {
+      errors.push("summary.potentialConflicts contains an invalid conflict");
+    }
+  }
+
+  if (Array.isArray(observations) && observations.length > 0) {
+    const complete = observations.every((observation) => isObject(observation) && observation.confirmed === true);
+    if (value.reviewStatus !== (complete ? "complete" : "incomplete")) {
+      errors.push("reviewStatus does not match the row confirmation states");
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}

@@ -4,7 +4,7 @@ import { formatBytes } from "../../lib/format";
 import type { PdfTextExtraction } from "../../lib/pdf";
 import { detectObservationCandidates, type ObservationCandidate } from "../../lib/candidate-extraction";
 import { attachPdfSourceBounds } from "../../lib/source-linking";
-import { buildReviewSummary, createReviewRecord } from "../../lib/review-record";
+import { buildReviewSummary, createReviewRecord, validateReviewRecord } from "../../lib/review-record";
 import SourcePdfViewer from "./SourcePdfViewer";
 
 type Props = {
@@ -133,6 +133,12 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
       },
       extraction,
     );
+    const validation = validateReviewRecord(record);
+    if (!validation.valid) {
+      onNotice("Export blocked", `The review record failed integrity checks: ${validation.errors.join("; ")}. No file was downloaded.`);
+      return;
+    }
+
     const blob = new Blob([JSON.stringify(record, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = window.document.createElement("a");

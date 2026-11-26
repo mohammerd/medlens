@@ -3,6 +3,7 @@ import { Check, CircleCheck, Crosshair, FileCheck, FileText, Info, LockKeyhole, 
 import { formatBytes } from "../../lib/format";
 import type { PdfTextExtraction } from "../../lib/pdf";
 import { detectObservationCandidates, type ObservationCandidate } from "../../lib/candidate-extraction";
+import { attachPdfSourceBounds } from "../../lib/source-linking";
 import SourcePdfViewer from "./SourcePdfViewer";
 
 type Props = {
@@ -84,16 +85,8 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
   };
 
   const findCandidates = () => {
-    const detected = detectObservationCandidates(text).map((candidate) => {
-      const sourceLine = extraction?.lines.find(
-        (line) => line.pageNumber === candidate.page && line.lineNumber === candidate.line,
-      );
-      const sourceBounds = sourceLine?.fragments.flatMap((fragment) =>
-        fragment.bounds ? [fragment.bounds] : [],
-      ) ?? [];
-
-      return { ...candidate, sourceBounds };
-    });
+    const extractedCandidates = detectObservationCandidates(text);
+    const detected = attachPdfSourceBounds(extractedCandidates, extraction?.lines ?? []);
 
     setCandidates(detected);
     setCandidatesAttempted(true);

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Activity,
   CircleAlert,
@@ -32,7 +32,7 @@ import {
   X,
 } from "lucide-react";
 import { demoReports, demoResultsByReport, trendPoints, type LabReport, type LabResult } from "./data/demo";
-import { formatBytes } from "./lib/format";
+import ReportIntake from "./features/upload/ReportIntake";
 
 type View = "Overview" | "Reports" | "Trends" | "Evidence library";
 type Notice = { title: string; message: string } | null;
@@ -111,10 +111,8 @@ function App() {
   const [selectedReport, setSelectedReport] = useState<LabReport | null>(null);
   const [selectedResult, setSelectedResult] = useState<LabResult>(demoResultsByReport["report-cbc-01"][0]);
   const [uploadOpen, setUploadOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [notice, setNotice] = useState<Notice>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const fileInput = useRef<HTMLInputElement>(null);
 
   const reportResults = selectedReport ? (demoResultsByReport[selectedReport.id] ?? []) : [];
 
@@ -131,20 +129,6 @@ function App() {
   const openReport = (report: LabReport) => {
     setSelectedReport(report);
     setSelectedResult(demoResultsByReport[report.id]?.[0] ?? demoResultsByReport["report-cbc-01"][0]);
-  };
-
-  const handleFile = (file?: File) => {
-    if (!file) return;
-    const accepted = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
-    if (!accepted.includes(file.type)) {
-      announce("Unsupported file", "Choose a PDF, PNG, JPG or WebP report.");
-      return;
-    }
-    if (file.size > 15 * 1024 * 1024) {
-      announce("File is too large", "The prototype accepts files up to 15 MB for local selection.");
-      return;
-    }
-    setSelectedFile(file);
   };
 
   const nav = (
@@ -227,7 +211,7 @@ function App() {
             <>
               <section className="page-heading">
                 <div><div className="eyebrow">WORKSPACE OVERVIEW</div><h1>Your health workspace<span className="heading-period">.</span></h1><p>A clearer view of your laboratory information, one report at a time.</p></div>
-                <button className="button-primary" onClick={() => { setUploadOpen(true); setSelectedFile(null); }}><Plus size={17} /> Add a report</button>
+                <button className="button-primary" onClick={() => setUploadOpen(true)}><Plus size={17} /> Add a report</button>
               </section>
 
               <section className="metric-grid" aria-label="Workspace summary">
@@ -315,17 +299,10 @@ function App() {
       </div>
 
       {uploadOpen && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setUploadOpen(false); }}>
-          <section className="modal upload-modal" role="dialog" aria-modal="true" aria-labelledby="upload-title">
-            <div className="modal-heading"><div><div className="panel-kicker">ADD TO WORKSPACE</div><h2 id="upload-title">Select a laboratory report</h2><p>Choose a PDF or image to explore the planned upload experience.</p></div><button className="icon-button" aria-label="Close dialog" onClick={() => setUploadOpen(false)}><X size={18} /></button></div>
-            <button className="upload-dropzone" onClick={() => fileInput.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); handleFile(event.dataTransfer.files[0]); }}>
-              <div className="upload-drop-icon"><Upload size={21} /></div><strong>{selectedFile ? selectedFile.name : "Drop your report here"}</strong><span>{selectedFile ? `${formatBytes(selectedFile.size)} · Selected on this device` : "or browse files from this device"}</span><em>PDF, PNG, JPG or WebP · Up to 15 MB</em>
-            </button>
-            <input ref={fileInput} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" hidden onChange={(event) => handleFile(event.target.files?.[0])} />
-            <div className="upload-local-note"><LockKeyhole size={15} /><span><strong>Local selection only.</strong> This frontend has no backend connection yet. Your file is not uploaded, stored or analysed.</span></div>
-            <div className="modal-actions"><button className="button-secondary" onClick={() => setUploadOpen(false)}>Cancel</button><button className="button-primary" disabled={!selectedFile} onClick={() => { setUploadOpen(false); announce("Prototype limitation", "The file was selected locally, but upload and report processing are not implemented yet. No file was sent anywhere."); }}>Continue <ArrowRight size={15} /></button></div>
-          </section>
-        </div>
+        <ReportIntake
+          onClose={() => setUploadOpen(false)}
+          onNotice={announce}
+        />
       )}
 
       {selectedReport && (

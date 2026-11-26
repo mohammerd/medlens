@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { detectObservationCandidates } from "./candidate-extraction";
+import fbcFixture from "../../tests/fixtures/fbc-demo-report.txt?raw";
 
 describe("detectObservationCandidates", () => {
   it("captures CBC values, original units and printed intervals", () => {
@@ -78,6 +79,24 @@ describe("detectObservationCandidates", () => {
     expect(row.valueAsReported).toBe(">12,5");
     expect(row.unitAsReported).toBe("g/dL");
     expect(row.referenceAsReported).toBeNull();
+  });
+
+  it("extracts supported rows from the synthetic FBC report fixture", () => {
+    const rows = detectObservationCandidates(fbcFixture);
+
+    expect(rows.map((row) => row.testKey)).toEqual([
+      "haemoglobin",
+      "red-blood-cell-count",
+      "white-blood-cell-count",
+      "platelet-count",
+      "packed-cell-volume",
+      "mean-cell-volume",
+      "mean-cell-haemoglobin",
+      "mean-cell-haemoglobin-concentration",
+    ]);
+    expect(rows.every((row) => row.confirmed === false)).toBe(true);
+    expect(rows.every((row) => row.page === 1)).toBe(true);
+    expect(rows[1].referenceAsReported).toBe("3.80-5.20");
   });
 
   it("preserves the complete matched source line", () => {

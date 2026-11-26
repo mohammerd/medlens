@@ -649,3 +649,148 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(105, 153, 11
   .selected-file-bar .button-secondary { margin-left: 43px; }
   .review-confirm-row { align-items: flex-start; flex-direction: column; }
 }
+
+
+/* Conservative observation candidate verification */
+.candidate-tool-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px;
+  border-top: 1px solid var(--line);
+}
+.candidate-tool-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.candidate-tool-copy strong {
+  color: #536654;
+  font-size: 9px;
+}
+.candidate-tool-copy span {
+  color: #9ba69b;
+  font-size: 8px;
+}
+.candidate-tool-row .button-secondary { min-height: 30px; font-size: 8px; }
+.candidate-review {
+  margin: 0 11px 10px;
+  border: 1px solid #e4ebe1;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+.candidate-review-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 11px;
+  background: #f5f8f3;
+  border-bottom: 1px solid #e8eee5;
+}
+.candidate-review-heading strong {
+  color: #4d604f;
+  font-size: 9px;
+}
+.candidate-review-heading span {
+  color: #8c9b8d;
+  font-size: 8px;
+}
+.candidate-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.candidate-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px;
+  border-bottom: 1px solid #edf1eb;
+  cursor: pointer;
+}
+.candidate-card:last-child { border-bottom: 0; }
+.candidate-card:hover { background: #fbfcfa; }
+.candidate-card-confirmed { background: #f4f8f1; }
+.candidate-card input {
+  accent-color: #52774f;
+  margin: 3px 0 0;
+  flex-shrink: 0;
+}
+.candidate-card-body {
+  flex: 1;
+  min-width: 0;
+}
+.candidate-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+.candidate-card-top strong {
+  color: #425545;
+  font-size: 9px;
+}
+.candidate-card-top span {
+  color: #9aa59b;
+  font-size: 7px;
+  white-space: nowrap;
+}
+.candidate-values {
+  display: grid;
+  grid-template-columns: .8fr 1fr 1fr;
+  gap: 6px;
+  margin-top: 9px;
+}
+.candidate-values > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.candidate-values small {
+  color: #9ba69b;
+  font-size: 6px;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.candidate-values strong {
+  color: #4c5d4e;
+  font-size: 8px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.candidate-card-body p {
+  margin: 8px 0 0;
+  color: #8f9a90;
+  font: 7px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow-wrap: anywhere;
+}
+.candidate-safety-note {
+  margin: 0;
+  padding: 9px 11px;
+  border-top: 1px solid #e8eee5;
+  background: #f8faf6;
+  color: #849184;
+  font-size: 7px;
+  line-height: 1.55;
+}
+.candidate-empty {
+  padding: 16px 12px;
+  color: #8b988d;
+  font-size: 8px;
+  line-height: 1.6;
+}
+.theme-dark .candidate-review { background: #17241b; border-color: #3b4b3d; }
+.theme-dark .candidate-review-heading, .theme-dark .candidate-safety-note { background: #223228; border-color: #3b4b3d; }
+.theme-dark .candidate-review-heading strong, .theme-dark .candidate-card-top strong, .theme-dark .candidate-values strong, .theme-dark .candidate-tool-copy strong { color: #d0dfd0; }
+.theme-dark .candidate-card { border-color: #304034; }
+.theme-dark .candidate-card:hover, .theme-dark .candidate-card-confirmed { background: #24372a; }
+.theme-dark .candidate-card-body p, .theme-dark .candidate-empty, .theme-dark .candidate-safety-note { color: #a6b4a6; }
+@media (max-width: 500px) {
+  .candidate-card-top { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .candidate-values { grid-template-columns: 1fr 1fr; }
+  .candidate-values > span:last-child { grid-column: 1 / -1; }
+}

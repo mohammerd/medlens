@@ -58,15 +58,16 @@ npm run build
 - Responsive research-product dashboard.
 - Overview, reports, trends and evidence-library navigation.
 - Synthetic example report with source traceability concept.
-- Local PDF preview and selectable-text extraction in the browser.
+- Local PDF preview, selectable-text extraction and approximate visual-row grouping in the browser.
 - Conservative candidate-row detection for selected CBC, lipid and glucose labels.
-- Manual confirmation of each detected row against the original document.
+- Editable candidate fields with source-line preservation and per-row human confirmation.
+- Synthetic FBC report fixture and regression tests for PDF row grouping and candidate extraction.
 - Image preview with manual transcription; image OCR is not implemented.
 - Light/dark appearance toggle.
 - Versioned frontend/backend data-contract draft.
 - Search and interactive report preview.
 
-**Important:** PDF extraction reads selectable text only; scanned PDFs require OCR, and images currently use manual transcription. Candidate detection is a conservative text-pattern experiment, not validated clinical extraction. No file upload, AI interpretation, account system or medical-data persistence is connected yet.
+**Important:** PDF extraction reads selectable text only; scanned PDFs require OCR, and images currently use manual transcription. Candidate detection and visual-row grouping are conservative document-processing experiments, not validated clinical extraction. No file upload, AI interpretation, account system or medical-data persistence is connected yet.
 
 ## Planned architecture
 

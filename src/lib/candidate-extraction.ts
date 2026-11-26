@@ -1,3 +1,5 @@
+import type { NormalizedRect } from "./pdf-layout";
+
 export interface ObservationCandidate {
   id: string;
   testKey: string;
@@ -5,6 +7,7 @@ export interface ObservationCandidate {
   valueAsReported: string;
   unitAsReported: string | null;
   referenceAsReported: string | null;
+  sourceBounds: NormalizedRect[];
   reviewedTestName: string;
   reviewedValueAsReported: string;
   reviewedUnitAsReported: string;
@@ -76,6 +79,7 @@ function parseMeasurementLine(rawLine: string, page: number, line: number): Obse
       valueAsReported,
       unitAsReported,
       referenceAsReported,
+      sourceBounds: [],
       reviewedTestName: entry.name,
       reviewedValueAsReported: valueAsReported,
       reviewedUnitAsReported: unitAsReported ?? "",

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, CircleCheck, FileCheck, FileText, Info, LockKeyhole, Upload, X } from "lucide-react";
 import { formatBytes } from "../../lib/format";
-import { extractPdfText, type PdfTextExtraction } from "../../lib/pdf";
+import type { PdfTextExtraction } from "../../lib/pdf";
 import { detectObservationCandidates, type ObservationCandidate } from "../../lib/candidate-extraction";
 
 type Props = {
@@ -65,6 +65,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
     setCandidates([]);
     setCandidatesAttempted(false);
     try {
+      const { extractPdfText } = await import("../../lib/pdf");
       const result = await extractPdfText(file);
       setExtraction(result);
       setText(result.text);

@@ -59,6 +59,7 @@ npm run build
 - Synthetic example report with source traceability concept.
 - Local file picker and drag-and-drop affordance.
 - Light/dark appearance toggle.
+- Versioned frontend/backend data-contract draft.
 - Search and interactive report preview.
 
 **Important:** selecting a file currently displays its name only. No OCR, upload, AI interpretation, account system or medical-data persistence is connected yet.

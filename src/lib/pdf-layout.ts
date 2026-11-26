@@ -62,11 +62,11 @@ export function normalizeViewportRect(
  */
 export function normalizePdfTextItemBounds(
   x: number, baselineY: number, width: number, height: number,
-  transform: [number, number, number, number, number, number],
+  transform: readonly number[],
   viewportWidth: number, viewportHeight: number,
 ): NormalizedRect | null {
-  if (![x, baselineY, width, height, ...transform].every(Number.isFinite) || width <= 0 || height <= 0) return null;
-  const [a, b, c, d, e, f] = transform;
+  if (transform.length !== 6 || ![x, baselineY, width, height, ...transform].every(Number.isFinite) || width <= 0 || height <= 0) return null;
+  const [a, b, c, d, e, f] = transform as [number, number, number, number, number, number];
   const corners = [[x, baselineY - height], [x + width, baselineY - height], [x, baselineY], [x + width, baselineY]]
     .map(([px, py]) => [a * px + c * py + e, b * px + d * py + f]);
   const rect: [number, number, number, number] = [

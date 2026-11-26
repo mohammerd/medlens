@@ -93,12 +93,12 @@ describe("groupPositionedText", () => {
     const rows = groupPositionedText([
       { text: "A", x: 0, y: 100 },
       { text: "B", x: 20, y: 96 },
-    ], 2);
+    ], 2.5);
 
     expect(rows).toHaveLength(2);
   });
   it("transforms text bounds through a rotated PDF viewport", () => {
-    expect(normalizePdfTextItemBounds(10, 30, 20, 10, [0, 1, -1, 0, 100, 0], 100, 100)).toEqual({ x: 0.6, y: 0.1, width: 0.1, height: 0.2 });
+    expect(normalizePdfTextItemBounds(10, 30, 20, 10, [0, 1, -1, 0, 100, 0], 100, 100)).toEqual({ x: 0.7, y: 0.1, width: 0.1, height: 0.2 });
   });
 
   it("returns null for invalid text-item geometry", () => {

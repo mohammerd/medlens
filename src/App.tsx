@@ -109,7 +109,7 @@ function App() {
   const [dark, setDark] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedReport, setSelectedReport] = useState<LabReport | null>(null);
-  const [selectedResult, setSelectedResult] = useState<LabResult>(demoResults[0]);
+  const [selectedResult, setSelectedResult] = useState<LabResult>(demoResultsByReport["report-cbc-01"][0]);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [notice, setNotice] = useState<Notice>(null);

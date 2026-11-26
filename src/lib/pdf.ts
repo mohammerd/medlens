@@ -24,10 +24,8 @@ export async function extractPdfText(
   }
 
   const data = new Uint8Array(await file.arrayBuffer());
-  const document = await pdfjs.getDocument({
-    data,
-    isEvalSupported: false,
-  }).promise;
+  const loadingTask = pdfjs.getDocument({ data });
+  const document = await loadingTask.promise;
 
   try {
     const pagesRead = Math.min(document.numPages, maxPages);
@@ -64,6 +62,6 @@ export async function extractPdfText(
       truncated: document.numPages > pagesRead,
     };
   } finally {
-    await document.destroy();
+    await loadingTask.destroy();
   }
 }

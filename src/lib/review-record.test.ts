@@ -153,7 +153,6 @@ describe("createReviewRecord", () => {
   });
 });
 
-
 describe("validateReviewRecord", () => {
   it("accepts a complete record that preserves its summary and provenance", () => {
     const record = createReviewRecord([candidate()], documentMetadata, null, "2026-11-26T17:00:00.000Z");

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, CircleCheck, Crosshair, FileCheck, FileText, Info, LockKeyhole, Upload, X } from "lucide-react";
+import { Check, CircleAlert, CircleCheck, Crosshair, Download, FileCheck, FileText, Info, LockKeyhole, Upload, X } from "lucide-react";
 import { formatBytes } from "../../lib/format";
 import type { PdfTextExtraction } from "../../lib/pdf";
 import { detectObservationCandidates, type ObservationCandidate } from "../../lib/candidate-extraction";
 import { attachPdfSourceBounds } from "../../lib/source-linking";
+import { buildReviewSummary, createReviewRecord } from "../../lib/review-record";
 import SourcePdfViewer from "./SourcePdfViewer";
 
 type Props = {
@@ -95,6 +96,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
   };
 
   const allCandidatesConfirmed = candidates.length > 0 && candidates.every((candidate) => candidate.confirmed);
+  const reviewSummary = buildReviewSummary(candidates, extraction);
 
   const updateCandidate = (
     id: string,
@@ -113,7 +115,34 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
   const confirmReview = () => {
     if (!text.trim() || !allCandidatesConfirmed) return;
     setReviewed(true);
-    onNotice("Text marked as reviewed", "This confirmation exists only in this browser session. Nothing has been saved or uploaded.");
+    onNotice("Text marked as reviewed", "This confirms that you checked the detected rows against the source. It is not clinical validation and remains in this browser session.");
+  };
+
+  const downloadReviewRecord = () => {
+    if (!file || !reviewed || !allCandidatesConfirmed) return;
+
+    const record = createReviewRecord(
+      candidates,
+      {
+        mediaType: file.type,
+        fileSizeBytes: file.size,
+        sourceMode: isPdf ? "pdf-selectable-text" : "manual-transcription",
+        totalPages: extraction?.totalPages ?? null,
+        pagesRead: extraction?.pagesRead ?? null,
+        truncated: extraction?.truncated ?? false,
+      },
+      extraction,
+    );
+    const blob = new Blob([JSON.stringify(record, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = window.document.createElement("a");
+    link.href = url;
+    link.download = `medlens-review-record-${new Date().toISOString().slice(0, 10)}.json`;
+    window.document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+    onNotice("Review record downloaded", "The JSON includes report measurements and source text. Keep it private; use synthetic reports only in this prototype.");
   };
 
   const canEditText = (isPdf && state === "done") || isImage;
@@ -308,16 +337,53 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
                             ))}
                           </div>
                         )}
+                        <section className="review-quality-summary" aria-label="Review quality summary">
+                          <div className="review-quality-heading">
+                            <div><span>REVIEW QUALITY SUMMARY</span><strong>{reviewSummary.confirmedCount} of {reviewSummary.candidateCount} detected rows confirmed</strong></div>
+                            <span>Local review only</span>
+                          </div>
+                          <div className="review-quality-metrics">
+                            <div><strong>{reviewSummary.pendingCount}</strong><span>Awaiting confirmation</span></div>
+                            <div><strong>{reviewSummary.missingUnitRows.length}</strong><span>Missing units</span></div>
+                            <div><strong>{reviewSummary.missingReferenceIntervalRows.length}</strong><span>Missing printed intervals</span></div>
+                            <div><strong>{reviewSummary.missingSourceHighlightRows.length}</strong><span>Source highlights unavailable</span></div>
+                            <div><strong>{reviewSummary.pagesWithoutSelectableText}</strong><span>Pages without selectable text</span></div>
+                            <div><strong>{reviewSummary.unmatchedSelectableLineCount}</strong><span>Other extracted text lines</span></div>
+                            <div><strong>{reviewSummary.potentialConflicts.length}</strong><span>Potential conflicting label groups</span></div>
+                          </div>
+                          {reviewSummary.potentialConflicts.map((conflict) => (
+                            <div className="review-quality-warning" role="note" key={conflict.key}>
+                              <CircleAlert size={14} />
+                              <span><strong>Check repeated values:</strong> {conflict.testName} appears on page {conflict.page} with different reported values ({conflict.values.join(" / ")}). Confirm whether these are separate samples. MEDLENS does not choose or merge values.</span>
+                            </div>
+                          ))}
+                          {reviewSummary.pagesWithoutSelectableText > 0 && (
+                            <p className="review-quality-footnote"><Info size={13} /> Some pages have no selectable PDF text. This may occur with scans or image-only pages; OCR is not included.</p>
+                          )}
+                          {reviewSummary.unmatchedSelectableLineCount > 0 && (
+                            <p className="review-quality-footnote"><Info size={13} /> Other extracted lines were not matched by this limited test-label detector. They may still contain relevant report content; inspect the original document.</p>
+                          )}
+                          {candidates.length === 0 && (
+                            <p className="review-quality-footnote"><Info size={13} /> No supported rows were recognized. This does not mean the report contains no results; inspect every original page manually.</p>
+                          )}
+                          {extraction?.truncated && (
+                            <p className="review-quality-footnote"><Info size={13} /> The prototype stopped after 50 pages. Remaining pages were not processed.</p>
+                          )}
+                        </section>
                         <p className="candidate-safety-note">These are text-pattern matches, not validated clinical observations. Confirm each row against the original report. No normal, high or low judgement is made.</p>
                       </div>
                     )}
                     <div className="review-confirm-row">
                       <div className={reviewed ? "review-confirm-state is-reviewed" : "review-confirm-state"}>
                         {reviewed ? <CircleCheck size={15} /> : <Info size={15} />}
-                        <span>{reviewed ? "Marked reviewed in this session" : allCandidatesConfirmed ? "All detected rows checked against source" : "Check every detected row against the original"}</span>
+                        <span>{reviewed ? "Rows checked in this browser session" : allCandidatesConfirmed ? "All detected rows checked against source" : "Check every detected row against the original"}</span>
                       </div>
-                      <button className="button-secondary" disabled={!allCandidatesConfirmed} onClick={confirmReview}>{reviewed ? "Reviewed" : "Confirm review"}</button>
+                      <div className="review-confirm-actions">
+                        <button className="button-secondary" disabled={!allCandidatesConfirmed || reviewed} onClick={confirmReview}>{reviewed ? "Reviewed" : "Confirm review"}</button>
+                        {reviewed && <button className="button-secondary review-export-button" onClick={downloadReviewRecord}><Download size={13} /> Download JSON</button>}
+                      </div>
                     </div>
+                    {reviewed && <p className="review-export-caution">The JSON contains extracted measurements and source text. Keep the downloaded file private. This prototype is for synthetic data only.</p>}
                   </>
                 )}
                 {isPdf && state === "error" && <button className="button-secondary retry-extract" onClick={extractLocally}>Try PDF extraction again</button>}
@@ -329,14 +395,14 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
 
         <div className="upload-local-note">
           <LockKeyhole size={15} />
-          <span><strong>Local-only prototype.</strong> PDF text extraction runs in your browser. No OCR, medical interpretation, API request, account storage or upload occurs. Do not use real patient reports in this research prototype.</span>
+          <span><strong>Local-only prototype.</strong> PDF text extraction runs in your browser. A reviewed JSON record can be downloaded to this device, but no report is uploaded or stored by MEDLENS. No OCR or medical interpretation occurs. Use synthetic reports only.</span>
         </div>
         <div className="modal-actions">
           <button className="button-secondary" onClick={onClose}>Close</button>
           <button
             className="button-primary"
             disabled={!file || !reviewed}
-            onClick={() => { onClose(); onNotice("Local review complete", "The file and extracted text were discarded when this dialog closed. Nothing was saved or sent anywhere."); }}
+            onClick={() => { onClose(); onNotice("Local review complete", "The source file and in-memory text were cleared from this session. Any JSON export remains in your device's downloads. No report was uploaded."); }}
           >
             Confirm local review <Check size={15} />
           </button>

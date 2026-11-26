@@ -15,6 +15,8 @@ This document describes the current frontend-only report workflow. It is an engi
 - Allow users to correct the detected test name, value, unit and printed interval while preserving the original source line.
 - Clear a row's confirmation whenever a correction is edited.
 - Require a user to check every detected candidate row before marking the review step complete.
+- Show a review-quality summary for missing units/intervals, unavailable highlights, differing repeated labels, pages without selectable text and lines outside the limited detector.
+- Download a versioned JSON record that keeps extracted values separate from reviewer-corrected values and includes raw source line, page/line and approximate highlight bounds.
 
 ## What it does not do
 
@@ -23,7 +25,7 @@ This document describes the current frontend-only report workflow. It is an engi
 - Baseline grouping does not reliably reconstruct arbitrary laboratory tables, multi-column layouts, rotated pages, handwritten entries or split labels and values.
 - It does not normalize units, convert decimal separators, infer missing reference ranges or reconcile different laboratory methods.
 - It does not calculate high/low/normal flags, diagnose disease, estimate risk or recommend treatment.
-- It does not yet create persisted structured observations or audit records.
+- It does not create server-persisted structured observations or audit records. JSON review exports are downloaded to the user's device and are not retained by the application.
 
 ## Candidate detector behaviour
 

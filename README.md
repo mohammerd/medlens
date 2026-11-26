@@ -6,7 +6,7 @@ MEDLENS is a research-oriented project exploring how software can turn laborator
 
 > **Research prototype. Not for diagnosis or clinical decision-making.**
 >
-> The current frontend is an interface prototype. Report upload is local-only and does not send files to a server. The displayed patient and laboratory information is synthetic demonstration data. Do not upload real patient records.
+> The current frontend is an interface prototype. Report upload is local-only and does not send files to a server. The displayed patient and laboratory information is synthetic demonstration data. Do not upload real patient records. A downloaded review JSON contains report-derived measurements and source text; keep it private and use synthetic records only.
 
 ## Project status
 
@@ -62,6 +62,8 @@ npm run build
 - Source-linked PDF page navigation with approximate highlights for detected observation text fragments.
 - Conservative candidate-row detection for selected CBC, lipid and glucose labels.
 - Editable candidate fields with source-line preservation and per-row human confirmation.
+- Review-quality summary for missing units/intervals, unavailable source highlights, repeated labels with differing values, pages without selectable text and unmatched text lines.
+- Downloadable, versioned JSON review record preserving original and reviewer-corrected fields, source text, page/line numbers and normalized highlight coordinates; export is local-only and does not persist records in the app.
 - Highlight geometry is approximate and must be checked against the visible original; it is not a guarantee that the extracted value is correct.
 - Synthetic FBC report fixture and regression tests for PDF row grouping and candidate extraction.
 - Image preview with manual transcription; image OCR is not implemented.

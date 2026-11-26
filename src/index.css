@@ -1,8 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 :root {
-  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #18251f;
   background: #f5f7f3;
   font-synthesis: none;
@@ -39,7 +38,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(105, 153, 11
 .brand-lockup { display: flex; align-items: center; gap: 10px; }
 .brand-mark { width: 34px; height: 34px; border-radius: 11px; background: #c9e8a9; color: #183626; display: grid; place-items: center; }
 .brand-copy { display: flex; flex-direction: column; gap: 1px; }
-.brand-copy span { font: 800 15px/1 "Manrope", sans-serif; letter-spacing: .095em; color: #f5f8f4; }
+.brand-copy span { font: 800 15px/1 ui-sans-serif, system-ui, sans-serif; letter-spacing: .095em; color: #f5f8f4; }
 .brand-copy small { font-size: 8px; letter-spacing: .17em; color: #91a899; font-weight: 700; margin-top: 4px; }
 .sidebar-close, .mobile-menu, .mobile-scrim { display: none !important; }
 .workspace-switcher { display: flex; align-items: center; gap: 10px; border: 1px solid rgba(221, 236, 224, .12); background: rgba(255,255,255,.045); border-radius: 10px; padding: 10px; margin: 0 0 29px; }

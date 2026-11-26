@@ -59,15 +59,17 @@ npm run build
 - Overview, reports, trends and evidence-library navigation.
 - Synthetic example report with source traceability concept.
 - Local PDF preview, selectable-text extraction and approximate visual-row grouping in the browser.
+- Source-linked PDF page navigation with approximate highlights for detected observation text fragments.
 - Conservative candidate-row detection for selected CBC, lipid and glucose labels.
 - Editable candidate fields with source-line preservation and per-row human confirmation.
+- Highlight geometry is approximate and must be checked against the visible original; it is not a guarantee that the extracted value is correct.
 - Synthetic FBC report fixture and regression tests for PDF row grouping and candidate extraction.
 - Image preview with manual transcription; image OCR is not implemented.
 - Light/dark appearance toggle.
 - Versioned frontend/backend data-contract draft.
 - Search and interactive report preview.
 
-**Important:** PDF extraction reads selectable text only; scanned PDFs require OCR, and images currently use manual transcription. Candidate detection and visual-row grouping are conservative document-processing experiments, not validated clinical extraction. No file upload, AI interpretation, account system or medical-data persistence is connected yet.
+**Important:** PDF extraction reads selectable text only; scanned PDFs require OCR, and images currently use manual transcription. Candidate detection, visual-row grouping and PDF source highlighting are conservative document-processing experiments, not validated clinical extraction. No file upload, AI interpretation, account system or medical-data persistence is connected yet.
 
 ## Planned architecture
 

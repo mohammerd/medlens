@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, CircleCheck, FileCheck, FileText, Info, LockKeyhole, Upload, X } from "lucide-react";
+import { Check, CircleCheck, Crosshair, FileCheck, FileText, Info, LockKeyhole, Upload, X } from "lucide-react";
 import { formatBytes } from "../../lib/format";
 import type { PdfTextExtraction } from "../../lib/pdf";
 import { detectObservationCandidates, type ObservationCandidate } from "../../lib/candidate-extraction";
+import { attachPdfSourceBounds } from "../../lib/source-linking";
+import SourcePdfViewer from "./SourcePdfViewer";
 
 type Props = {
   onClose: () => void;
@@ -19,6 +21,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
   const [reviewed, setReviewed] = useState(false);
   const [candidates, setCandidates] = useState<ObservationCandidate[]>([]);
   const [candidatesAttempted, setCandidatesAttempted] = useState(false);
+  const [activeCandidateId, setActiveCandidateId] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -54,6 +57,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
     setReviewed(false);
     setCandidates([]);
     setCandidatesAttempted(false);
+    setActiveCandidateId(null);
   };
 
   const extractLocally = async () => {
@@ -64,6 +68,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
     setReviewed(false);
     setCandidates([]);
     setCandidatesAttempted(false);
+    setActiveCandidateId(null);
     try {
       const { extractPdfText } = await import("../../lib/pdf");
       const result = await extractPdfText(file);
@@ -80,8 +85,12 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
   };
 
   const findCandidates = () => {
-    setCandidates(detectObservationCandidates(text));
+    const extractedCandidates = detectObservationCandidates(text);
+    const detected = attachPdfSourceBounds(extractedCandidates, extraction?.lines ?? []);
+
+    setCandidates(detected);
     setCandidatesAttempted(true);
+    setActiveCandidateId(detected[0]?.sourceBounds.length ? detected[0].id : null);
     setReviewed(false);
   };
 
@@ -98,6 +107,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
       ),
     );
     setReviewed(false);
+    setActiveCandidateId(null);
   };
 
   const confirmReview = () => {
@@ -157,11 +167,24 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
             <div className="local-review-grid">
               <section className="local-review-panel">
                 <div className="local-review-heading"><span>ORIGINAL DOCUMENT</span><span>LOCAL PREVIEW</span></div>
-                <div className="local-preview-frame">
-                  {isPdf && previewUrl && <iframe src={previewUrl} title={"Local preview of " + file.name} />}
-                  {isImage && previewUrl && <img src={previewUrl} alt="Selected laboratory report preview" />}
-                  {!isPdf && !isImage && <div className="local-preview-placeholder"><FileText size={28} /><span>Preview unavailable for this file type.</span></div>}
-                </div>
+                {isPdf && (
+                  <SourcePdfViewer
+                    file={file}
+                    totalPages={extraction?.totalPages ?? 1}
+                    candidate={candidates.find((candidate) => candidate.id === activeCandidateId) ?? null}
+                    onClearHighlight={() => setActiveCandidateId(null)}
+                  />
+                )}
+                {isImage && (
+                  <div className="local-preview-frame">
+                    {previewUrl && <img src={previewUrl} alt="Selected laboratory report preview" />}
+                  </div>
+                )}
+                {!isPdf && !isImage && (
+                  <div className="local-preview-frame">
+                    <div className="local-preview-placeholder"><FileText size={28} /><span>Preview unavailable for this file type.</span></div>
+                  </div>
+                )}
                 <p className="local-panel-caption">The original file stays in this browser tab. Closing the tab clears this temporary preview.</p>
               </section>
 
@@ -191,7 +214,7 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
                       id="report-source-text"
                       className="source-textarea"
                       value={text}
-                      onChange={(event) => { setText(event.target.value); setReviewed(false); setCandidates([]); setCandidatesAttempted(false); }}
+                      onChange={(event) => { setText(event.target.value); setReviewed(false); setCandidates([]); setCandidatesAttempted(false); setActiveCandidateId(null); }}
                       placeholder={isPdf ? "No selectable text was found. Scanned PDF OCR will be added in a later stage." : "Type or paste visible report text here. This is not OCR."}
                       spellCheck={false}
                     />
@@ -229,6 +252,19 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
                                   <div className="candidate-card-top">
                                     <strong>Review extracted observation</strong>
                                     <span>Page {candidate.page} · line {candidate.line}</span>
+                                  </div>
+                                  <div className="candidate-source-action">
+                                    <span>{candidate.sourceBounds.length > 0 ? "Original text geometry available" : "No precise highlight available"}</span>
+                                    <button
+                                      type="button"
+                                      className="source-jump-button"
+                                      disabled={candidate.sourceBounds.length === 0}
+                                      aria-pressed={activeCandidateId === candidate.id}
+                                      onClick={() => setActiveCandidateId(candidate.id)}
+                                    >
+                                      {activeCandidateId === candidate.id ? "Highlighted" : "View source"}
+                                      <Crosshair size={12} />
+                                    </button>
                                   </div>
                                   <label className="candidate-field candidate-name-field">
                                     <small>TEST NAME</small>

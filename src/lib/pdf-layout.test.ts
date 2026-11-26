@@ -1,8 +1,32 @@
 import { describe, expect, it } from "vitest";
-import { groupPositionedText } from "./pdf-layout";
+import { groupPositionedText, normalizeViewportRect } from "./pdf-layout";
 import { detectObservationCandidates } from "./candidate-extraction";
 
 describe("groupPositionedText", () => {
+  it("normalizes PDF viewport coordinates for responsive highlighting", () => {
+    expect(normalizeViewportRect([100, 200, 300, 240], 1000, 800)).toEqual({
+      x: 0.1,
+      y: 0.25,
+      width: 0.2,
+      height: 0.05,
+    });
+  });
+
+  it("clips highlight rectangles to the page bounds", () => {
+    expect(normalizeViewportRect([-20, 50, 120, 150], 100, 100)).toEqual({
+      x: 0,
+      y: 0.5,
+      width: 1,
+      height: 0.5,
+    });
+  });
+
+  it("rejects invalid or zero-area highlight rectangles", () => {
+    expect(normalizeViewportRect([10, 10, 10, 20], 100, 100)).toBeNull();
+    expect(normalizeViewportRect([0, 0, 10, 10], 0, 100)).toBeNull();
+    expect(normalizeViewportRect([0, 0, Number.NaN, 10], 100, 100)).toBeNull();
+  });
+
   it("joins fragments on the same visual baseline in left-to-right order", () => {
     const rows = groupPositionedText([
       { text: "12.0-16.0", x: 280, y: 700 },
@@ -13,6 +37,7 @@ describe("groupPositionedText", () => {
 
     expect(rows).toHaveLength(1);
     expect(rows[0].text).toBe("Haemoglobin 13.4 g/dL 12.0-16.0");
+    expect(rows[0].fragments.map((fragment) => fragment.text)).toEqual(["Haemoglobin", "13.4", "g/dL", "12.0-16.0"]);
   });
 
   it("separates nearby visual rows and sorts them top to bottom", () => {

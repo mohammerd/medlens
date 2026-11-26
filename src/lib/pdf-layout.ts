@@ -46,11 +46,13 @@ export function normalizeViewportRect(
 
   if (right <= left || bottom <= top) return null;
 
+  const round = (value: number) => Math.round(value * 1_000_000) / 1_000_000;
+
   return {
-    x: left,
-    y: top,
-    width: right - left,
-    height: bottom - top,
+    x: round(left),
+    y: round(top),
+    width: round(right - left),
+    height: round(bottom - top),
   };
 }
 

@@ -65,6 +65,7 @@ npm run build
 - Editable candidate fields with source-line preservation and per-row human confirmation.
 - Review-quality summary for missing units/intervals, unavailable source highlights, repeated labels with differing values, pages without selectable text and unmatched text lines.
 - Downloadable, versioned JSON review record preserving original and reviewer-corrected fields, source text, page/line numbers and normalized highlight coordinates; export is local-only and does not persist records in the app.
+- Runtime validation checks the exported record's version, row counts and confirmation status, unique IDs, page counts, source references and normalized highlight bounds before download; this is data-integrity checking, not clinical validation.
 - Highlight geometry is approximate and must be checked against the visible original; it is not a guarantee that the extracted value is correct.
 - Synthetic FBC report fixture and regression tests for PDF row grouping and candidate extraction.
 - Image preview with manual transcription; image OCR is not implemented.

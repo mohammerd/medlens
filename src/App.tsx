@@ -28,7 +28,7 @@ import {
   Sparkles,
   Sun,
   TrendingUp,
-  Upload,
+  History,
   X,
 } from "lucide-react";
 import { demoReports, demoResultsByReport, trendPoints, type LabReport, type LabResult } from "./data/demo";

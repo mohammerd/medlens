@@ -58,9 +58,9 @@ function Brand() {
 
 function StatusPill({ status }: { status: LabReport["status"] }) {
   const styles = {
-    Reviewed: "pill-green",
-    "Needs review": "pill-amber",
-    Demo: "pill-muted",
+    Example: "pill-green",
+    "Needs verification": "pill-amber",
+    "Not connected": "pill-muted",
   };
   return <span className={`status-pill ${styles[status]}`}><span className="status-dot" />{status}</span>;
 }
@@ -226,7 +226,7 @@ function App() {
           {view === "Overview" && (
             <>
               <section className="page-heading">
-                <div><div className="eyebrow">THURSDAY, 26 NOVEMBER 2026</div><h1>Your health workspace<span className="heading-period">.</span></h1><p>A clearer view of your laboratory information, one report at a time.</p></div>
+                <div><div className="eyebrow">WORKSPACE OVERVIEW</div><h1>Your health workspace<span className="heading-period">.</span></h1><p>A clearer view of your laboratory information, one report at a time.</p></div>
                 <button className="button-primary" onClick={() => { setUploadOpen(true); setSelectedFile(null); }}><Plus size={17} /> Add a report</button>
               </section>
 
@@ -260,7 +260,7 @@ function App() {
                 <div className="right-rail">
                   <div className="panel review-panel">
                     <div className="panel-heading compact-heading"><div><div className="panel-kicker">ATTENTION</div><h2>Review queue</h2></div><span className="queue-count">01</span></div>
-                    <div className="review-item"><div className="review-icon"><CircleAlert size={17} /></div><div className="review-copy"><strong>One result needs checking</strong><p>Lipid Profile · Reference interval requires confirmation in this sample record.</p><button onClick={() => openReport(demoReports[1])}>Review report <ArrowRight size={13} /></button></div></div>
+                    <div className="review-item"><div className="review-icon"><CircleAlert size={17} /></div><div className="review-copy"><strong>One result needs checking</strong><p>Lipid Profile · A reference interval is intentionally omitted from this sample record.</p><button onClick={() => openReport(demoReports[1])}>Review report <ArrowRight size={13} /></button></div></div>
                     <div className="review-note"><Info size={14} /><span>This is a simulated workflow. It does not identify a real health risk.</span></div>
                   </div>
                   <div className="panel getting-started">

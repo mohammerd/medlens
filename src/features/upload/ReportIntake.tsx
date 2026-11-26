@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, CircleCheck, FileCheck, FileText, Info, LockKeyhole, Upload, X } from "lucide-react";
 import { formatBytes } from "../../lib/format";
 import { extractPdfText, type PdfTextExtraction } from "../../lib/pdf";
+import { detectObservationCandidates, type ObservationCandidate } from "../../lib/candidate-extraction";
 
 type Props = {
   onClose: () => void;
@@ -16,6 +17,8 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
   const [state, setState] = useState<"idle" | "reading" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [reviewed, setReviewed] = useState(false);
+  const [candidates, setCandidates] = useState<ObservationCandidate[]>([]);
+  const [candidatesAttempted, setCandidatesAttempted] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -49,6 +52,8 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
     setState("idle");
     setError(null);
     setReviewed(false);
+    setCandidates([]);
+    setCandidatesAttempted(false);
   };
 
   const extractLocally = async () => {
@@ -57,6 +62,8 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
     setError(null);
     setText("");
     setReviewed(false);
+    setCandidates([]);
+    setCandidatesAttempted(false);
     try {
       const result = await extractPdfText(file);
       setExtraction(result);
@@ -71,8 +78,16 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
     }
   };
 
+  const findCandidates = () => {
+    setCandidates(detectObservationCandidates(text));
+    setCandidatesAttempted(true);
+    setReviewed(false);
+  };
+
+  const allCandidatesConfirmed = candidates.length > 0 && candidates.every((candidate) => candidate.confirmed);
+
   const confirmReview = () => {
-    if (!text.trim()) return;
+    if (!text.trim() || !allCandidatesConfirmed) return;
     setReviewed(true);
     onNotice("Text marked as reviewed", "This confirmation exists only in this browser session. Nothing has been saved or uploaded.");
   };
@@ -162,16 +177,64 @@ export default function ReportIntake({ onClose, onNotice }: Props) {
                       id="report-source-text"
                       className="source-textarea"
                       value={text}
-                      onChange={(event) => { setText(event.target.value); setReviewed(false); }}
+                      onChange={(event) => { setText(event.target.value); setReviewed(false); setCandidates([]); setCandidatesAttempted(false); }}
                       placeholder={isPdf ? "No selectable text was found. Scanned PDF OCR will be added in a later stage." : "Type or paste visible report text here. This is not OCR."}
                       spellCheck={false}
                     />
+                    <div className="candidate-tool-row">
+                      <div className="candidate-tool-copy">
+                        <strong>Find possible result rows</strong>
+                        <span>Conservative label matching · no medical classification</span>
+                      </div>
+                      <button className="button-secondary" disabled={!text.trim()} onClick={findCandidates}>Find rows</button>
+                    </div>
+                    {candidatesAttempted && (
+                      <div className="candidate-review">
+                        <div className="candidate-review-heading">
+                          <strong>Candidate observations</strong>
+                          <span>{candidates.length} detected</span>
+                        </div>
+                        {candidates.length === 0 ? (
+                          <div className="candidate-empty">
+                            No supported test rows were recognized. The detector only matches known labels at the start of a line; inspect the document manually.
+                          </div>
+                        ) : (
+                          <div className="candidate-list">
+                            {candidates.map((candidate) => (
+                              <label className={candidate.confirmed ? "candidate-card candidate-card-confirmed" : "candidate-card"} key={candidate.id}>
+                                <input
+                                  type="checkbox"
+                                  checked={candidate.confirmed}
+                                  onChange={(event) => {
+                                    setCandidates((current) => current.map((item) => item.id === candidate.id ? { ...item, confirmed: event.target.checked } : item));
+                                    setReviewed(false);
+                                  }}
+                                />
+                                <div className="candidate-card-body">
+                                  <div className="candidate-card-top">
+                                    <strong>{candidate.testName}</strong>
+                                    <span>Page {candidate.page} · line {candidate.line}</span>
+                                  </div>
+                                  <div className="candidate-values">
+                                    <span><small>REPORTED VALUE</small><strong>{candidate.valueAsReported}</strong></span>
+                                    <span><small>UNIT</small><strong>{candidate.unitAsReported || "Not captured"}</strong></span>
+                                    <span><small>PRINTED RANGE</small><strong>{candidate.referenceAsReported || "Not found"}</strong></span>
+                                  </div>
+                                  <p>{candidate.rawLine}</p>
+                                </div>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                        <p className="candidate-safety-note">These are text-pattern matches, not validated clinical observations. Confirm each row against the original report. No normal, high or low judgement is made.</p>
+                      </div>
+                    )}
                     <div className="review-confirm-row">
                       <div className={reviewed ? "review-confirm-state is-reviewed" : "review-confirm-state"}>
                         {reviewed ? <CircleCheck size={15} /> : <Info size={15} />}
-                        <span>{reviewed ? "Marked reviewed in this session" : "Compare this text with the original document"}</span>
+                        <span>{reviewed ? "Marked reviewed in this session" : allCandidatesConfirmed ? "All detected rows checked against source" : "Check every detected row against the original"}</span>
                       </div>
-                      <button className="button-secondary" disabled={!text.trim()} onClick={confirmReview}>{reviewed ? "Reviewed" : "Mark text checked"}</button>
+                      <button className="button-secondary" disabled={!allCandidatesConfirmed} onClick={confirmReview}>{reviewed ? "Reviewed" : "Confirm review"}</button>
                     </div>
                   </>
                 )}

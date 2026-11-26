@@ -233,7 +233,12 @@ function isReviewRowReference(value: unknown): boolean {
 function isNormalizedRect(value: unknown): value is ObservationCandidate["sourceBounds"][number] {
   if (!isObject(value)) return false;
   const { x, y, width, height } = value;
-  if (![x, y, width, height].every((part) => typeof part === "number" && Number.isFinite(part))) return false;
+  if (
+    typeof x !== "number" || !Number.isFinite(x)
+    || typeof y !== "number" || !Number.isFinite(y)
+    || typeof width !== "number" || !Number.isFinite(width)
+    || typeof height !== "number" || !Number.isFinite(height)
+  ) return false;
   return x >= 0 && y >= 0 && width > 0 && height > 0
     && x + width <= 1.000001 && y + height <= 1.000001;
 }

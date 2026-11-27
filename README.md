@@ -63,7 +63,7 @@ npm run build
 - Deterministic nearest-baseline text grouping with bounded font-size-aware tolerance and regression tests for mixed sizes, shuffled fragments and close rows.
 - Conservative candidate-row detection for selected CBC, lipid and glucose labels.
 - Editable candidate fields with source-line preservation and per-row human confirmation.
-- Review-quality summary for missing units/intervals, unavailable source highlights, repeated labels with differing values, pages without selectable text and unmatched text lines.
+- Review-quality summary for missing units/intervals, unavailable source highlights, repeated labels with differing values, pages without selectable text and unmatched lines.
 - Downloadable, versioned JSON review record preserving original and reviewer-corrected fields, source text, page/line numbers and normalized highlight coordinates; export is local-only and does not persist records in the app.
 - Runtime validation checks the exported record's version, row counts and confirmation status, unique IDs, page counts, source references and normalized highlight bounds before download; this is data-integrity checking, not clinical validation.
 - Highlight geometry is approximate and must be checked against the visible original; it is not a guarantee that the extracted value is correct.
@@ -107,7 +107,7 @@ The backend should expose validated structured observations and provenance. The 
 - Clinical explanations and safety behaviour require review by qualified healthcare professionals before any patient-facing clinical pilot.
 - The project must not present an LLM-generated explanation as a diagnosis or treatment recommendation.
 
-See [ROADMAP.md](ROADMAP.md), [SECURITY.md](SECURITY.md), [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/EXTRACTION_LIMITATIONS.md](docs/EXTRACTION_LIMITATIONS.md).
+See [ROADMAP.md](ROADMAP.md), [OPEN_SOURCE_REUSE.md](docs/OPEN_SOURCE_REUSE.md), [SECURITY.md](SECURITY.md), [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/EXTRACTION_LIMITATIONS.md](docs/EXTRACTION_LIMITATIONS.md).
 
 ## License
 
